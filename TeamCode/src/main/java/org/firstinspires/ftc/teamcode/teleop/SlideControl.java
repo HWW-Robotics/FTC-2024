@@ -59,14 +59,16 @@ public class SlideControl extends OpMode {
                 this.slideLift.right.setPower(power);
             }
         } else {
-            if (this.gamepad2.dpad_up) {
-                this.slideRotate.move(-15);
-            } else if (this.gamepad2.dpad_down) {
-                this.slideRotate.move(15);
-            } else if (this.gamepad2.dpad_left) {
-                this.slideRotate.setPosition(0);
-            } else {
-                this.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
+            if (this.slideLift.getLeftPosition() < 200) {
+                if (this.gamepad2.dpad_up) {
+                    this.slideRotate.move(-15);
+                } else if (this.gamepad2.dpad_down) {
+                    this.slideRotate.move(15);
+                } else if (this.gamepad2.dpad_left) {
+                    this.slideRotate.setPosition(0);
+                } else {
+                    this.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
+                }
             }
             this.slideLift.move((int) (-this.gamepad2.left_stick_y * 50));
             this.slideRotate.update();
