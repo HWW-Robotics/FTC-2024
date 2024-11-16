@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name = "BlueParkObs")
-public class BlueParkObs extends LinearOpMode {
+@Autonomous(name = "RedParkObs")
+public class RedParkObs extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {

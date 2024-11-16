@@ -46,7 +46,7 @@ public class ClawSlide {
             new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(0)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 1000),
-            new MotorPairAction(this.slideLift, LIFT_MAX_POSITION),
+            new MotorPairAction(this.slideLift, LIFT_MAX_POSITION_HORIZON),
             new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)));
 
         this.slideRotate.resetPosition();
@@ -84,7 +84,7 @@ public class ClawSlide {
         final double horizonRatio = Math.sin(this.slideRotate.getLeftPosition() * ROTATE_ANGLE_RATIO * Math.PI / 180);
         int maxPos = LIFT_MAX_POSITION;
         if (horizonRatio > 0) {
-            maxPos = Math.min(LIFT_MAX_POSITION, (int)(LIFT_MAX_POSITION_HORIZON / horizonRatio));
+            maxPos = Math.min(maxPos, (int)(LIFT_MAX_POSITION_HORIZON / horizonRatio));
         }
         this.slideLift.setMaxPosition(maxPos);
         this.slideRotate.update();
