@@ -39,23 +39,11 @@ public class ClawSlide {
              clawArmRight);
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new Action(
-            new TimedAction(1.0) {
-                @Override
-                public void begin() {
-                    super.begin();
-                    ClawSlide.this.claw.setRotate(0);
-                }
-            })
+            new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(0)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 1000),
             new MotorPairAction(this.slideLift, LIFT_MAX_POSITION),
-            new TimedAction(1.0) {
-                @Override
-                public void begin() {
-                    super.begin();
-                    ClawSlide.this.claw.setRotate(90);
-                }
-            });
+            new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)));
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();

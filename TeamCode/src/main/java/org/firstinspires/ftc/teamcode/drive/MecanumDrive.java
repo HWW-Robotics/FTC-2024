@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class MecanumDrive {
-    private static final double POWER_RATIO = 2000;
+    private static final double POWER_RATIO = 2500;
     private final DcMotor rightFront, rightRear, leftFront, leftRear;
     private double maxPower;
     private double rightFrontPower, rightRearPower, leftFrontPower, leftRearPower, powerBase;
@@ -19,10 +19,10 @@ public class MecanumDrive {
         this.rightRear.setDirection(DcMotor.Direction.REVERSE);
         this.leftFront.setDirection(DcMotor.Direction.FORWARD);
         this.leftRear.setDirection(DcMotor.Direction.FORWARD);
-        this.rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
