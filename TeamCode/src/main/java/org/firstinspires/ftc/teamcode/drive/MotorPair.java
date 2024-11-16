@@ -37,6 +37,16 @@ public class MotorPair {
         this.right.setPower(this.power);
     }
 
+    public double getPower() {
+        return this.power;
+    }
+
+    public void setPower(double power) {
+        this.power = Math.min(Math.max(power, 0), 1);
+        this.left.setPower(this.power);
+        this.right.setPower(this.power);
+    }
+
     public void resetPosition() {
         this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
