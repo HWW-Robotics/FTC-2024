@@ -6,17 +6,21 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.action.Action;
 import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedAction;
+import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
 
 public class ClawSlide {
-    private static final int ROTATE_MAX_POSITION = 800;
-    private static final int LIFT_MAX_POSITION = 2750;
     private static final double ROTATE_POWER = 0.5;
     private static final double LIFT_POWER = 1.0;
+    private static final int ROTATE_MAX_POSITION = 900;
+    private static final double ROTATE_ANGLE_RATIO = 90.0 / 1000;
+    private static final int LIFT_MAX_POSITION = 2750;
+    private static final int LIFT_MAX_POSITION_HORIZON = 2150;
+
+    private final Action PUT_DOWN_AND_EXTEND_ACTION;
 
     public final MotorPair slideRotate, slideLift;
     public final Claw claw;
     private Action action = null;
-    private final Action PUT_DOWN_AND_EXTEND_ACTION;
 
     public ClawSlide(
         DcMotor leftRotation, DcMotor rightRotation, DcMotor leftSlide, DcMotor rightSlide,
@@ -64,7 +68,7 @@ public class ClawSlide {
 
     public void putDownAndExtend() {
         if (this.inAction()) {
-            throw new IllegalStateException("Another action is already in progress");
+            this.cancelAction();
         }
         this.action = this.PUT_DOWN_AND_EXTEND_ACTION;
         this.action.reset();
@@ -77,6 +81,12 @@ public class ClawSlide {
                 this.action = null;
             }
         }
+        final double horizonRatio = Math.sin(this.slideRotate.getLeftPosition() * ROTATE_ANGLE_RATIO * Math.PI / 180);
+        int maxPos = LIFT_MAX_POSITION;
+        if (horizonRatio > 0) {
+            maxPos = Math.min(LIFT_MAX_POSITION, (int)(LIFT_MAX_POSITION_HORIZON / horizonRatio));
+        }
+        this.slideLift.setMaxPosition(maxPos);
         this.slideRotate.update();
         this.slideLift.update();
     }

@@ -47,6 +47,17 @@ public class MotorPair {
         this.right.setPower(this.power);
     }
 
+    public int getMaxPosition() {
+        return this.maxPosition;
+    }
+
+    public void setMaxPosition(int pos) {
+        this.maxPosition = pos;
+        if (pos < this.maxPosition) {
+            this.setPosition(this.currentTargetPos);
+        }
+    }
+
     public void resetPosition() {
         this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
