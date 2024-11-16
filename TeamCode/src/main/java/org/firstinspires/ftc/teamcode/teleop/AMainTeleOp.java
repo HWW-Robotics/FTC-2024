@@ -127,8 +127,9 @@ public class AMainTeleOp extends OpMode {
         if (clawActioned) {
             this.clawSlide.cancelAction();
         }
-
-        this.clawSlide.update();
+        if (!this.gamepad2.guide) {
+            this.clawSlide.update();
+        }
 
         this.telemetry.addData("LeftSlideRot", this.clawSlide.slideRotate.getLeftPosition());
         this.telemetry.addData("RightSlideRot", this.clawSlide.slideRotate.getRightPosition());

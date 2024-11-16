@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedAction;
 
 public class ClawSlide {
-    private static final int ROTATE_MAX_POSITION = 750;
+    private static final int ROTATE_MAX_POSITION = 800;
     private static final int LIFT_MAX_POSITION = 2750;
     private static final double ROTATE_POWER = 0.5;
     private static final double LIFT_POWER = 1.0;
