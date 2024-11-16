@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.action;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class TimedAction implements ActionStage {
-    private final ElapsedTime timer = new ElapsedTime();
+    protected final ElapsedTime timer = new ElapsedTime();
     private final double time;
     private final Runnable action;
 
