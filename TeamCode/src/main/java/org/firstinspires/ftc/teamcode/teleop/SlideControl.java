@@ -19,7 +19,7 @@ public class SlideControl extends OpMode {
                 hardwareMap.get(DcMotor.class, "rightRotation"),
                 DcMotor.Direction.REVERSE);
         this.slideLift = new MotorPair(
-                2500,
+                2750,
                 1.0,
                 hardwareMap.get(DcMotor.class, "leftSlide"),
                 hardwareMap.get(DcMotor.class, "rightSlide"));
@@ -59,24 +59,27 @@ public class SlideControl extends OpMode {
                 this.slideLift.right.setPower(power);
             }
         } else {
-            if (this.gamepad2.dpad_up) {
-                this.slideRotate.move(-15);
-            } else if (this.gamepad2.dpad_down) {
-                this.slideRotate.move(15);
-            } else if (this.gamepad2.dpad_left) {
-                this.slideRotate.setPosition(0);
-            } else {
-                this.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
+            if (this.slideLift.getLeftPosition() < 250) {
+                if (this.gamepad2.dpad_up) {
+                    this.slideRotate.move(-15);
+                } else if (this.gamepad2.dpad_down) {
+                    this.slideRotate.move(15);
+                } else if (this.gamepad2.dpad_left) {
+                    this.slideRotate.setPosition(0);
+                } else {
+                    this.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
+                }
             }
             this.slideLift.move((int) (-this.gamepad2.left_stick_y * 50));
             this.slideRotate.update();
             this.slideLift.update();
         }
 
-        this.telemetry.addData("LeftRotation", "%d; %d", this.slideRotate.getLeftPosition(), this.slideRotate.resetting);
-        this.telemetry.addData("RightRotation", "%d", this.slideRotate.getRightPosition());
-        this.telemetry.addData("LeftPosition", "%d; %d", this.slideLift.getLeftPosition(), this.slideLift.resetting);
-        this.telemetry.addData("RightPosition", "%d", this.slideLift.getRightPosition());
+        this.telemetry.addData("Rotation Power", "%.03f", this.slideRotate.getPower());
+        this.telemetry.addData("LeftRotation", this.slideRotate.getLeftPosition());
+        this.telemetry.addData("RightRotation", this.slideRotate.getRightPosition());
+        this.telemetry.addData("LeftPosition", this.slideLift.getLeftPosition());
+        this.telemetry.addData("RightPosition", this.slideLift.getRightPosition());
         this.telemetry.update();
     }
 }

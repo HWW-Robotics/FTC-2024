@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class MecanumDrive {
+    private static final double POWER_RATIO = 2000;
     private final DcMotor rightFront, rightRear, leftFront, leftRear;
     private double maxPower;
     private double rightFrontPower, rightRearPower, leftFrontPower, leftRearPower, powerBase;
@@ -54,10 +56,23 @@ public class MecanumDrive {
             this.leftRear.setPower(0);
             return;
         }
-        this.rightFront.setPower(this.rightFrontPower / this.powerBase * this.maxPower);
-        this.rightRear.setPower(this.rightRearPower / this.powerBase * this.maxPower);
-        this.leftFront.setPower(this.leftFrontPower / this.powerBase * this.maxPower);
-        this.leftRear.setPower(this.leftRearPower / this.powerBase * this.maxPower);
+        final double powerFactor = this.maxPower / this.powerBase;
+        double
+            rfPower = this.rightFrontPower * powerFactor,
+            rrPower = this.rightRearPower * powerFactor,
+            lfPower = this.leftFrontPower * powerFactor,
+            lrPower = this.leftRearPower * powerFactor;
+        if (this.rightFront instanceof DcMotorEx && this.rightRear instanceof DcMotorEx && this.leftFront instanceof DcMotorEx && this.leftRear instanceof DcMotorEx) {
+            ((DcMotorEx) this.rightFront).setVelocity(rfPower * POWER_RATIO);
+            ((DcMotorEx) this.rightRear).setVelocity(rrPower * POWER_RATIO);
+            ((DcMotorEx) this.leftFront).setVelocity(lfPower * POWER_RATIO);
+            ((DcMotorEx) this.leftRear).setVelocity(lrPower * POWER_RATIO);
+        } else {
+            this.rightFront.setPower(rfPower);
+            this.rightRear.setPower(rrPower);
+            this.leftFront.setPower(lfPower);
+            this.leftRear.setPower(lrPower);
+        }
         this.rightFrontPower = 0;
         this.rightRearPower = 0;
         this.leftFrontPower = 0;
@@ -77,7 +92,7 @@ public class MecanumDrive {
         double yaw = Math.atan2(y, x) - Math.PI / 4;
         double xPower = Math.sin(yaw) * power;
         double yPower = Math.cos(yaw) * power;
-        this.addPowers(xPower, yPower, xPower, yPower);
+        this.addPowers(yPower, xPower, xPower, yPower);
     }
 
     /**

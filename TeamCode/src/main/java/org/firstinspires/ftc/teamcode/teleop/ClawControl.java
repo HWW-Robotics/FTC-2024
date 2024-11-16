@@ -17,33 +17,36 @@ public class ClawControl extends OpMode {
             hardwareMap.get(Servo.class, "ClawRotRight"),
             hardwareMap.get(Servo.class, "ClawArmLeft"),
             hardwareMap.get(Servo.class, "ClawArmRight"));
+        this.claw.closeAll();
     }
 
     @Override
     public void loop() {
         if (this.gamepad2.left_bumper) {
-            this.claw.openLeft();
-        } else {
             this.claw.closeLeft();
+        } else {
+            this.claw.openLeft();
         }
         if (this.gamepad2.right_bumper) {
-            this.claw.openRight();
-        } else {
             this.claw.closeRight();
+        } else {
+            this.claw.openRight();
         }
         if (!this.gamepad2.guide) {
             if (this.gamepad2.y) {
-                this.claw.setRotate(0.5);
+                this.claw.setRotate(180);
+            } else if (this.gamepad2.b) {
+                this.claw.setRotate(90);
             } else if (this.gamepad2.b) {
                 this.claw.setRotate(0);
             } else {
-                this.claw.rotate(this.gamepad2.right_stick_y * 0.01);
+                this.claw.rotate(this.gamepad2.right_stick_y * 5);
             }
         }
-        this.telemetry.addData("LeftRot", this.claw.leftRot.getPosition());
-        this.telemetry.addData("RightRot", this.claw.rightRot.getPosition());
-        this.telemetry.addData("LeftClaw", this.claw.leftClaw.getPosition());
-        this.telemetry.addData("RightClaw", this.claw.rightClaw.getPosition());
+        this.telemetry.addData("LeftRot", this.claw.getLeftRotAngle());
+        this.telemetry.addData("RightRot", this.claw.getRightRotAngle());
+        this.telemetry.addData("LeftClaw", this.claw.getLeftClawAngle());
+        this.telemetry.addData("RightClaw", this.claw.getRightClawAngle());
         this.telemetry.update();
     }
 }

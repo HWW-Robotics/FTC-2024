@@ -3,12 +3,13 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
-    private static final double MIN_ROT = 0.0;
-    private static final double MAX_ROT = 1.0;
-    private static final double MIN_CLAW = 0.5;
-    private static final double MAX_CLAW = 1.0;
-    public final Servo leftRot, rightRot;
-    public final Servo leftClaw, rightClaw;
+    private static final double ROT_RATIO = 250;
+    private static final double MIN_ROT = 2;
+    private static final double MAX_ROT = 195;
+    private static final double MIN_CLAW = 10;
+    private static final double MAX_CLAW = 46;
+    private final Servo leftRot, rightRot;
+    private final Servo leftClaw, rightClaw;
 
     public Claw(Servo leftRot, Servo rightRot, Servo leftClaw, Servo rightClaw) {
         this.leftRot = leftRot;
@@ -19,6 +20,42 @@ public class Claw {
         this.rightRot.setDirection(Servo.Direction.REVERSE);
         this.leftClaw.setDirection(Servo.Direction.FORWARD);
         this.rightClaw.setDirection(Servo.Direction.REVERSE);
+        this.leftRot.scaleRange(0, 1);
+        this.rightRot.scaleRange(0, 1);
+        this.leftClaw.scaleRange(0, 1);
+        this.rightClaw.scaleRange(0, 1);
+    }
+
+    public double getLeftRotAngle() {
+        return this.leftRot.getPosition() * ROT_RATIO;
+    }
+
+    protected void setLeftRotAngle(double angle) {
+        this.leftRot.setPosition(angle / ROT_RATIO);
+    }
+
+    public double getRightRotAngle() {
+        return this.rightRot.getPosition() * ROT_RATIO;
+    }
+
+    protected void setRightRotAngle(double angle) {
+        this.rightRot.setPosition(angle / ROT_RATIO);
+    }
+
+    public double getLeftClawAngle() {
+        return this.leftClaw.getPosition() * ROT_RATIO;
+    }
+
+    public void setLeftClawAngle(double angle) {
+        this.leftClaw.setPosition(angle / ROT_RATIO);
+    }
+
+    public double getRightClawAngle() {
+        return this.rightClaw.getPosition() * ROT_RATIO;
+    }
+
+    public void setRightClawAngle(double angle) {
+        this.rightClaw.setPosition(angle / ROT_RATIO);
     }
 
     public void closeAll() {
@@ -27,28 +64,28 @@ public class Claw {
     }
 
     public void closeLeft() {
-        this.leftClaw.setPosition(MIN_CLAW);;
+        this.setLeftClawAngle(MIN_CLAW);;
     }
 
     public void closeRight() {
-        this.rightClaw.setPosition(MIN_CLAW);;
+        this.setRightClawAngle(MIN_CLAW);
     }
 
     public void openLeft() {
-        this.leftClaw.setPosition(MAX_CLAW);;
+        this.setLeftClawAngle(MAX_CLAW);;
     }
 
     public void openRight() {
-        this.rightClaw.setPosition(MAX_CLAW);;
+        this.setRightClawAngle(MAX_CLAW);;
     }
 
-    public void setRotate(double rotate) {
-        rotate = Math.min(Math.max(rotate, MIN_ROT), MAX_ROT);
-        this.leftRot.setPosition(rotate);
-        this.rightRot.setPosition(rotate);
+    public void setRotate(double angle) {
+        angle = Math.min(Math.max(angle, MIN_ROT), MAX_ROT);
+        this.setLeftRotAngle(angle);
+        this.setRightRotAngle(angle);
     }
 
-    public void rotate(double rotate) {
-        this.setRotate(this.leftRot.getPosition() + rotate);
+    public void rotate(double angle) {
+        this.setRotate(this.getLeftRotAngle() + angle);
     }
 }
