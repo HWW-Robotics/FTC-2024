@@ -38,11 +38,6 @@ public class AMainTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        /// Drives
-        this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
-        this.drive.rotate(this.gamepad1.right_stick_x * 0.5);
-        this.drive.updatePowers();
-
         boolean clawActioned = false;
 
         /// Slides
@@ -112,16 +107,15 @@ public class AMainTeleOp extends OpMode {
             this.clawSlide.claw.openRight();
         }
         if (!this.gamepad2.guide) {
-            if (this.gamepad2.y) {
+            if (this.gamepad2.a) {
                 this.clawSlide.claw.setRotate(180);
                 clawActioned = true;
             } else if (this.gamepad2.b) {
                 this.clawSlide.claw.setRotate(90);
                 clawActioned = true;
             } else if (this.gamepad2.x) {
-                if (this.clawSlide.inAction()) {
-                    this.clawSlide.cancelAction();
-                }
+                this.clawSlide.retractAndPullUp();
+            } else if (this.gamepad2.y) {
                 this.clawSlide.putDownAndExtend();
             } else if (this.gamepad2.right_stick_y != 0) {
                 this.clawSlide.claw.rotate(this.gamepad2.right_stick_y * 5);
@@ -134,6 +128,14 @@ public class AMainTeleOp extends OpMode {
         if (!this.gamepad2.guide) {
             this.clawSlide.update();
         }
+
+        /// Drives
+        boolean safeDrive = this.clawSlide.slideRotate.getLeftPosition() < 850 || this.clawSlide.claw.getLeftRotAngle() < 100;
+        if (safeDrive) {
+            this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
+            this.drive.rotate(this.gamepad1.right_stick_x * 0.6);
+        }
+        this.drive.updatePowers();
 
         this.telemetry.addData("LeftSlideRot", this.clawSlide.slideRotate.getLeftPosition());
         this.telemetry.addData("RightSlideRot", this.clawSlide.slideRotate.getRightPosition());
