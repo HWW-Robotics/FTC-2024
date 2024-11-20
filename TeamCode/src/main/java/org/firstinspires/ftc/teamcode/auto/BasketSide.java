@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name = "ObsSide")
-public class ObsSide extends LinearOpMode {
+@Autonomous(name = "BasketSide")
+public class BasketSide extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -26,14 +26,27 @@ public class ObsSide extends LinearOpMode {
             hardwareMap.get(Servo.class, "ClawArmLeft"),
             hardwareMap.get(Servo.class, "ClawArmRight")
         );
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(new Pose2d(0, 0))
+        clawSlide.claw.closeAll();
+
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(new Pose2d())
                 .addTemporalMarker(() -> {
-                    clawSlide.claw.closeAll();
                     clawSlide.claw.setRotate(90);
                 })
-                .forward(1)
-                .waitSeconds(5)
-                .strafeRight(10)
+                .forward(3)
+                .strafeLeft(10)
+                .turn(Math.toRadians(100))
+                .waitSeconds(1)
+                .addTemporalMarker(() -> {
+                    clawSlide.slideLift.setPosition(1500);
+                })
+                .waitSeconds(2)
+                .addTemporalMarker(() -> {
+                    clawSlide.claw.setRotate(180);
+                })
+                .waitSeconds(1)
+                .addTemporalMarker(() -> {
+                    clawSlide.claw.openAll();
+                })
                 .build();
 
         this.waitForStart();
