@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class MecanumDrive {
-    private static final double POWER_RATIO = 2500;
+    private static final double POWER_RATIO = 5000;
     private final DcMotor rightFront, rightRear, leftFront, leftRear;
     private double maxPower;
     private double rightFrontPower, rightRearPower, leftFrontPower, leftRearPower, powerBase;

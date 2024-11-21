@@ -11,13 +11,16 @@ import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
 public class ClawSlide {
     private static final double ROTATE_POWER = 0.5;
     private static final double LIFT_POWER = 1.0;
+
     private static final int ROTATE_MAX_POSITION = 1100;
     private static final double ROTATE_ANGLE_RATIO = 90.0 / 1000;
     private static final int LIFT_MAX_POSITION = 2900;
     private static final int LIFT_MAX_POSITION_HORIZON = 2150;
 
-    private final Action PUT_DOWN_ACTION;
-    private final Action RETRACT_AND_PULL_UP_ACTION;
+    private final Action
+        PUT_DOWN_ACTION,
+        PUT_DOWN_AND_EXTEND_ACTION,
+        RETRACT_AND_PULL_UP_ACTION;
 
     public final MotorPair slideRotate, slideLift;
     public final Claw claw;
@@ -47,6 +50,12 @@ public class ClawSlide {
             new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 1050));
+
+        this.PUT_DOWN_AND_EXTEND_ACTION = new Action(
+            new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)),
+            new MotorPairAction(this.slideLift, 0),
+            new MotorPairAction(this.slideRotate, 850),
+            new MotorPairAction(this.slideLift, LIFT_MAX_POSITION_HORIZON));
 
         this.RETRACT_AND_PULL_UP_ACTION = new Action(
             new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)),
@@ -80,6 +89,10 @@ public class ClawSlide {
 
     public void putDown() {
         this.setAction(this.PUT_DOWN_ACTION);
+    }
+
+    public void putDownAndExtend() {
+        this.setAction(this.PUT_DOWN_AND_EXTEND_ACTION);
     }
 
     public void retractAndPullUp() {

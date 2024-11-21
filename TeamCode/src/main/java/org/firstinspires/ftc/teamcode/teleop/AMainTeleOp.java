@@ -107,16 +107,15 @@ public class AMainTeleOp extends OpMode {
             this.clawSlide.claw.openRight();
         }
         if (!this.gamepad2.guide) {
-            if (this.gamepad2.a) {
-                this.clawSlide.claw.setRotate(180);
-                clawActioned = true;
-            } else if (this.gamepad2.b) {
+            if (this.gamepad2.b) {
                 this.clawSlide.claw.setRotate(90);
                 clawActioned = true;
-            } else if (this.gamepad2.x) {
-                this.clawSlide.retractAndPullUp();
             } else if (this.gamepad2.y) {
+                this.clawSlide.retractAndPullUp();
+            } else if (this.gamepad2.x) {
                 this.clawSlide.putDown();
+            } else if (this.gamepad2.a) {
+                this.clawSlide.putDownAndExtend();
             } else if (this.gamepad2.right_stick_y != 0) {
                 this.clawSlide.claw.rotate(this.gamepad2.right_stick_y * 5);
                 clawActioned = true;
