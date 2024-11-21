@@ -116,7 +116,7 @@ public class AMainTeleOp extends OpMode {
             } else if (this.gamepad2.x) {
                 this.clawSlide.retractAndPullUp();
             } else if (this.gamepad2.y) {
-                this.clawSlide.putDownAndExtend();
+                this.clawSlide.putDown();
             } else if (this.gamepad2.right_stick_y != 0) {
                 this.clawSlide.claw.rotate(this.gamepad2.right_stick_y * 5);
                 clawActioned = true;
