@@ -37,7 +37,7 @@ public class ClawControl extends OpMode {
                 this.claw.setRotate(180);
             } else if (this.gamepad2.b) {
                 this.claw.setRotate(90);
-            } else if (this.gamepad2.b) {
+            } else if (this.gamepad2.x) {
                 this.claw.setRotate(0);
             } else {
                 this.claw.rotate(this.gamepad2.right_stick_y * 5);

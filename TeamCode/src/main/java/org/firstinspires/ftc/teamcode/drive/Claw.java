@@ -71,6 +71,11 @@ public class Claw {
         this.setRightClawAngle(MIN_CLAW);
     }
 
+    public void openAll() {
+        this.openLeft();
+        this.openRight();
+    }
+
     public void openLeft() {
         this.setLeftClawAngle(MAX_CLAW);;
     }

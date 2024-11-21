@@ -22,7 +22,7 @@ public class DriveControl extends OpMode {
     @Override
     public void loop() {
         this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
-        this.drive.rotate(this.gamepad1.right_stick_x);
+        this.drive.rotate(this.gamepad1.right_stick_x * 0.5);
         this.drive.updatePowers();
     }
 }
