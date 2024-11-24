@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 @TeleOp(name = "AMainTeleOp")
 public class AMainTeleOp extends OpMode {
     public static AMainTeleOp INSTANCE = null;
-    final double MAX_DRIVE_POWER = 0.5;
+    static final double MAX_DRIVE_POWER = 0.5;
     MecanumDrive drive;
     ClawSlide clawSlide;
 
@@ -65,7 +65,7 @@ public class AMainTeleOp extends OpMode {
                 this.clawSlide.slideRotate.right.setPower(power);
             }
             if (this.gamepad2.left_stick_y != 0) {
-                double power = -this.gamepad2.left_stick_y * 0.2;
+                double power = -this.gamepad2.left_stick_y * 0.8;
                 this.clawSlide.slideLift.left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 this.clawSlide.slideLift.right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 this.clawSlide.slideLift.left.setPower(power);
@@ -84,10 +84,11 @@ public class AMainTeleOp extends OpMode {
                 } else if (this.gamepad2.dpad_left) {
                     this.clawSlide.slideRotate.setPosition(0);
                     clawActioned = true;
-                } else if (this.gamepad2.left_stick_x != 0) {
-                    this.clawSlide.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
-                    clawActioned = true;
                 }
+                // else if (this.gamepad2.left_stick_x != 0) {
+                //     this.clawSlide.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
+                //     clawActioned = true;
+                // }
             }
             if (this.gamepad2.left_stick_y != 0) {
                 this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 50));
@@ -117,7 +118,7 @@ public class AMainTeleOp extends OpMode {
             } else if (this.gamepad2.a) {
                 this.clawSlide.putDownAndExtend();
             } else if (this.gamepad2.right_stick_y != 0) {
-                this.clawSlide.claw.rotate(this.gamepad2.right_stick_y * 5);
+                this.clawSlide.claw.rotate(-this.gamepad2.right_stick_y * 5);
                 clawActioned = true;
             }
         }

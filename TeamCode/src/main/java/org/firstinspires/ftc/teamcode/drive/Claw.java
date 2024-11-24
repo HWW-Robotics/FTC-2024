@@ -6,7 +6,7 @@ public class Claw {
     private static final double ROT_RATIO = 250;
     private static final double MIN_ROT = 2;
     private static final double MAX_ROT = 195;
-    private static final double MIN_CLAW = 10;
+    private static final double MIN_CLAW = 9;
     private static final double MAX_CLAW = 46;
     private final Servo leftRot, rightRot;
     private final Servo leftClaw, rightClaw;

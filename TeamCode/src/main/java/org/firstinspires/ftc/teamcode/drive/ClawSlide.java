@@ -9,10 +9,10 @@ import org.firstinspires.ftc.teamcode.action.TimedAction;
 import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
 
 public class ClawSlide {
-    private static final double ROTATE_POWER = 0.5;
+    private static final double ROTATE_POWER = 0.3;
     private static final double LIFT_POWER = 1.0;
 
-    private static final int ROTATE_MAX_POSITION = 1100;
+    private static final int ROTATE_MAX_POSITION = 1090;
     private static final double ROTATE_ANGLE_RATIO = 90.0 / 1000;
     private static final int LIFT_MAX_POSITION = 2900;
     private static final int LIFT_MAX_POSITION_HORIZON = 2150;
@@ -47,20 +47,23 @@ public class ClawSlide {
              clawArmRight);
 
         this.PUT_DOWN_ACTION = new Action(
-            new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)),
+            new TimedAction(0.2, () -> ClawSlide.this.claw.setRotate(190)),
             new MotorPairAction(this.slideLift, 0),
-            new MotorPairAction(this.slideRotate, 1050));
+            new MotorPairAction(this.slideRotate, 1080),
+            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(128)));
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new Action(
-            new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)),
+            new TimedAction(0.2, () -> ClawSlide.this.claw.setRotate(190)),
             new MotorPairAction(this.slideLift, 0),
-            new MotorPairAction(this.slideRotate, 850),
-            new MotorPairAction(this.slideLift, LIFT_MAX_POSITION_HORIZON));
+            new MotorPairAction(this.slideRotate, 1015),
+            new MotorPairAction(this.slideLift, 1165),
+            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(122)));
 
         this.RETRACT_AND_PULL_UP_ACTION = new Action(
-            new TimedAction(1.0, () -> ClawSlide.this.claw.setRotate(90)),
+            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(180)),
             new MotorPairAction(this.slideLift, 0),
-            new MotorPairAction(this.slideRotate, 0));
+            new MotorPairAction(this.slideRotate, 0),
+            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(111)));
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();
