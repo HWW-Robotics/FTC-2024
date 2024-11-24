@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 /*
@@ -45,7 +46,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.9685; // in
     public static double GEAR_RATIO = 1.05307498; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 13.04; // in
+    public static double TRACK_WIDTH = 19; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -93,14 +94,19 @@ public class DriveConstants {
     /*
      * Adjust the orientations here to match your robot. See the FTC SDK documentation for details.
      */
-    public static RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
+    public static final RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR =
             RevHubOrientationOnRobot.LogoFacingDirection.UP;
-    public static RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR =
+    public static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR =
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
+    public static final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(new RevHubOrientationOnRobot(DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
 
     public static double encoderTicksToInches(double ticks) {
-        return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
+        return ticks / TICKS_PER_REV * WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO;
+    }
+
+    public static double inchesToEncoderTicks(double ins) {
+        return ins / (WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO) * TICKS_PER_REV;
     }
 
     public static double rpmToVelocity(double rpm) {
