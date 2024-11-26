@@ -19,20 +19,20 @@ public class AMainTeleOp extends OpMode {
     public void init() {
         INSTANCE = this;
         this.drive = new MecanumDrive(
-            MAX_DRIVE_POWER,
-            hardwareMap.get(DcMotor.class, "rightFront"),
-            hardwareMap.get(DcMotor.class,"rightRear"),
-            hardwareMap.get(DcMotor.class,"leftFront"),
-            hardwareMap.get(DcMotor.class,"leftRear"));
+                MAX_DRIVE_POWER,
+                hardwareMap.get(DcMotor.class, "rightFront"),
+                hardwareMap.get(DcMotor.class,"rightRear"),
+                hardwareMap.get(DcMotor.class,"leftFront"),
+                hardwareMap.get(DcMotor.class,"leftRear"));
         this.clawSlide = new ClawSlide(
-            hardwareMap.get(DcMotor.class, "leftRotation"),
-            hardwareMap.get(DcMotor.class, "rightRotation"),
-            hardwareMap.get(DcMotor.class, "leftSlide"),
-            hardwareMap.get(DcMotor.class, "rightSlide"),
-            hardwareMap.get(Servo.class, "ClawRotLeft"),
-            hardwareMap.get(Servo.class, "ClawRotRight"),
-            hardwareMap.get(Servo.class, "ClawArmLeft"),
-            hardwareMap.get(Servo.class, "ClawArmRight")
+                hardwareMap.get(DcMotor.class, "leftRotation"),
+                hardwareMap.get(DcMotor.class, "rightRotation"),
+                hardwareMap.get(DcMotor.class, "leftSlide"),
+                hardwareMap.get(DcMotor.class, "rightSlide"),
+                hardwareMap.get(Servo.class, "ClawRotLeft"),
+                hardwareMap.get(Servo.class, "ClawRotRight"),
+                hardwareMap.get(Servo.class, "ClawArmLeft"),
+                hardwareMap.get(Servo.class, "ClawArmRight")
         );
     }
 
@@ -130,11 +130,11 @@ public class AMainTeleOp extends OpMode {
         }
 
         /// Drives
-        boolean safeDrive = this.clawSlide.slideRotate.getLeftPosition() < 850 || this.clawSlide.claw.getLeftRotAngle() < 100;
-        if (safeDrive) {
-            this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
-            this.drive.rotate(this.gamepad1.right_stick_x * 0.6);
-        }
+//        boolean safeDrive = this.clawSlide.slideRotate.getLeftPosition() < 850 || this.clawSlide.claw.getLeftRotAngle() < 100;
+//        if (safeDrive) {
+        this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
+        this.drive.rotate(this.gamepad1.right_stick_x * 0.6);
+//        }
         this.drive.updatePowers();
 
         this.telemetry.addData("LeftSlideRot", this.clawSlide.slideRotate.getLeftPosition());
