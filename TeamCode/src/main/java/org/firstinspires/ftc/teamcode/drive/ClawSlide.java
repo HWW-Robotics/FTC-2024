@@ -41,10 +41,10 @@ public class ClawSlide {
                 leftSlide,
                 rightSlide);
         this.claw = new Claw(
-                clawRotLeft,
-                clawRotRight,
-                clawArmLeft,
-                clawArmRight);
+            clawRotLeft,
+            clawRotRight,
+            clawArmLeft,
+            clawArmRight);
 
         this.PUT_DOWN_ACTION = new Action(
             new TimedAction(0.2, () -> ClawSlide.this.claw.setRotate(20)),
