@@ -130,11 +130,8 @@ public class AMainTeleOp extends OpMode {
         }
 
         /// Drives
-        boolean safeDrive = true || this.clawSlide.slideRotate.getLeftPosition() < 850 || this.clawSlide.claw.getLeftRotAngle() < 100;
-        if (safeDrive) {
-            this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
-            this.drive.rotate(this.gamepad1.right_stick_x * 0.6);
-        }
+        this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
+        this.drive.rotate(this.gamepad1.right_stick_x);
         this.drive.updatePowers();
 
         this.telemetry.addData("LeftSlideRot", this.clawSlide.slideRotate.getLeftPosition());
