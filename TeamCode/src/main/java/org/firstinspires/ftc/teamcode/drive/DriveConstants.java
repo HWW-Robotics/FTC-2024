@@ -99,7 +99,9 @@ public class DriveConstants {
     public static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR =
             RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
-    public static final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(new RevHubOrientationOnRobot(DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
+    public static IMU.Parameters getIMUParameters() {
+        return new IMU.Parameters(new RevHubOrientationOnRobot(DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
+    }
 
     public static double encoderTicksToInches(double ticks) {
         return ticks / TICKS_PER_REV * WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO;

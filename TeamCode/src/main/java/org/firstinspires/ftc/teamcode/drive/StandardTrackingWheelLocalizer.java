@@ -44,7 +44,7 @@ public class StandardTrackingWheelLocalizer extends TwoTrackingWheelLocalizer {
         lastEncVels = lastTrackingEncVels;
 
         imu = hardwareMap.get(IMU.class, "imu");
-        imu.initialize(DriveConstants.IMU_PARAMETERS);
+        imu.initialize(DriveConstants.getIMUParameters());
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
 
