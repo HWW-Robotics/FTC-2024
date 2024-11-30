@@ -55,27 +55,26 @@ public class ClawSlide {
             clawArmRight);
 
         this.PUT_DOWN_ACTION = new Action(
-            new TimedAction(0.2, () -> ClawSlide.this.claw.setRotate(20)),
+            new TimedAction(0.2, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 940),
-            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(105)));
+            new TimedAction(0.5, () -> this.claw.setRotate(105)));
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new Action(
-            new TimedAction(0.2, () -> ClawSlide.this.claw.setRotate(20)),
+            new TimedAction(0.2, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 945),
             new MotorPairAction(this.slideLift, 1125),
-            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(102)));
+            new TimedAction(0.5, () -> this.claw.setRotate(102)));
 
         this.RETRACT_AND_PULL_UP_ACTION = new Action(
-            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(20)),
+            new TimedAction(0.5, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 0),
-            new TimedAction(0.5, () -> ClawSlide.this.claw.setRotate(111)));
+            new TimedAction(0.5, () -> this.claw.setRotate(111)));
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();
-        this.claw.closeAll();
     }
 
     public boolean inAction() {

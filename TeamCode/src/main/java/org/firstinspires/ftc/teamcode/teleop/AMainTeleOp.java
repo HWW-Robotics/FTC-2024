@@ -34,6 +34,7 @@ public class AMainTeleOp extends OpMode {
             hardwareMap.get(Servo.class, "ClawArmLeft"),
             hardwareMap.get(Servo.class, "ClawArmRight")
         );
+        this.clawSlide.claw.closeAll();
     }
 
     @Override
