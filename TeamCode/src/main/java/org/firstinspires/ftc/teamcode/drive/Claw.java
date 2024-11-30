@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
-    private static final double ROT_RATIO = 250;
+    private static final double ROT_RATIO = 250.0;
     private static final double MIN_ROT = 2;
     private static final double MAX_ROT = 195;
     private static final double MIN_CLAW = 8;
     private static final double MAX_CLAW = 46;
+    private double maxRot = MAX_ROT;
     private final Servo leftRot, rightRot;
     private final Servo leftClaw, rightClaw;
 
@@ -24,6 +25,14 @@ public class Claw {
         this.rightRot.scaleRange(0, 1);
         this.leftClaw.scaleRange(0, 1);
         this.rightClaw.scaleRange(0, 1);
+    }
+
+    public double getMaxRot() {
+        return this.maxRot;
+    }
+
+    public void setMaxRot(double rot) {
+        this.maxRot = Math.min(Math.max(rot, MIN_ROT), MAX_CLAW);
     }
 
     public double getLeftRotAngle() {
@@ -85,7 +94,7 @@ public class Claw {
     }
 
     public void setRotate(double angle) {
-        angle = Math.min(Math.max(angle, MIN_ROT), MAX_ROT);
+        angle = Math.min(Math.max(angle, MIN_ROT), this.maxRot);
         this.setLeftRotAngle(angle);
         this.setRightRotAngle(angle);
     }
