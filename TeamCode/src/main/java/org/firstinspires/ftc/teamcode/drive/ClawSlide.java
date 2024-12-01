@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.action.Action;
+import org.firstinspires.ftc.teamcode.action.ActionSequence;
 import org.firstinspires.ftc.teamcode.action.MotorPairAction;
-import org.firstinspires.ftc.teamcode.action.TimedAction;
+import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
 import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
 
 public class ClawSlide {
@@ -25,14 +25,14 @@ public class ClawSlide {
     private static final double CLAW_ROT_OFFSET = 70;
     private static final double CLAW_ARM_LENGTH = 18.0;
 
-    private final Action
+    private final ActionSequence
         PUT_DOWN_ACTION,
         PUT_DOWN_AND_EXTEND_ACTION,
         RETRACT_AND_PULL_UP_ACTION;
 
     public final MotorPair slideRotate, slideLift;
     public final Claw claw;
-    private Action action = null;
+    private ActionSequence action = null;
 
     public ClawSlide(
         DcMotor leftRotation, DcMotor rightRotation, DcMotor leftSlide, DcMotor rightSlide,
@@ -54,24 +54,24 @@ public class ClawSlide {
             clawArmLeft,
             clawArmRight);
 
-        this.PUT_DOWN_ACTION = new Action(
-            new TimedAction(0.2, () -> this.claw.setRotate(20)),
+        this.PUT_DOWN_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.2, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 940),
-            new TimedAction(0.5, () -> this.claw.setRotate(105)));
+            new TimedUpdateAction(0.5, () -> this.claw.setRotate(105)));
 
-        this.PUT_DOWN_AND_EXTEND_ACTION = new Action(
-            new TimedAction(0.2, () -> this.claw.setRotate(20)),
+        this.PUT_DOWN_AND_EXTEND_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.2, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 945),
             new MotorPairAction(this.slideLift, 1125),
-            new TimedAction(0.5, () -> this.claw.setRotate(102)));
+            new TimedUpdateAction(0.5, () -> this.claw.setRotate(102)));
 
-        this.RETRACT_AND_PULL_UP_ACTION = new Action(
-            new TimedAction(0.5, () -> this.claw.setRotate(20)),
+        this.RETRACT_AND_PULL_UP_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.5, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 0),
-            new TimedAction(0.5, () -> this.claw.setRotate(111)));
+            new TimedUpdateAction(0.5, () -> this.claw.setRotate(111)));
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();
@@ -85,16 +85,16 @@ public class ClawSlide {
         if (this.action == null) {
             return;
         }
-        this.action.reset();
+        this.action.begin();
         this.action = null;
     }
 
-    private void setAction(Action action) {
+    private void setAction(ActionSequence action) {
         if (this.inAction()) {
             this.cancelAction();
         }
         this.action = action;
-        this.action.reset();
+        this.action.begin();
     }
 
     public void putDown() {

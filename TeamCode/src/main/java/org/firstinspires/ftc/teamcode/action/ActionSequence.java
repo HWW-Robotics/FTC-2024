@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.action;
 
-public class Action {
+public class ActionSequence implements ActionStage {
     private final ActionStage[] stages;
     private int stage = -1;
 
-    public Action(ActionStage... stages) {
+    public ActionSequence(ActionStage... stages) {
         this.stages = stages;
     }
 
@@ -16,19 +16,22 @@ public class Action {
         return this.stage >= 0 && this.stage < this.stages.length;
     }
 
+    @Override
     public boolean isDone() {
-        return this.stage >= this.stages.length;
+        return this.stage == -2 || this.stage >= this.stages.length;
     }
 
-    public void reset() {
+    @Override
+    public void begin() {
         if (this.isRunning()) {
             this.stages[this.stage].after();
         }
         this.stage = -1;
     }
 
+    @Override
     public void update() {
-        if (this.stage >= this.stages.length) {
+        if (this.isDone()) {
             return;
         }
         if (this.stage == -1) {
@@ -39,12 +42,17 @@ public class Action {
         while (stage.isDone()) {
             stage.after();
             this.stage++;
-            if (this.stage >= this.stages.length) {
+            if (this.isDone()) {
                 return;
             }
             stage = this.stages[this.stage];
             stage.begin();
         }
         stage.update();
+    }
+
+    @Override
+    public void after() {
+        this.stage = -2;
     }
 }

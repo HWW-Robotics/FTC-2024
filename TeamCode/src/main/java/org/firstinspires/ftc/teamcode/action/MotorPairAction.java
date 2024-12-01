@@ -16,7 +16,10 @@ public class MotorPairAction implements ActionStage {
     }
 
     @Override
-    public void begin() {
+    public void begin() {}
+
+    @Override
+    public void update() {
         this.motors.setPosition(this.targetPos);
     }
 }

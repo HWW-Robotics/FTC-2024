@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.action;
 
-public final class MultiAction implements ActionStage {
+public final class ActionSet implements ActionStage {
     private final ActionStage[] actions;
 
-    public MultiAction(ActionStage... actions) {
+    public ActionSet(ActionStage... actions) {
         this.actions = actions;
     }
 
