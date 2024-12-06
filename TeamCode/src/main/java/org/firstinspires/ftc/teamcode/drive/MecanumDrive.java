@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class MecanumDrive {
     private static final double POWER_RATIO = DriveConstants.inchesToEncoderTicks(120);
