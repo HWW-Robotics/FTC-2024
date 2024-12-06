@@ -45,7 +45,13 @@ public class BackAndForth extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {
+            telemetry.addLine("Forwarding");
+            telemetry.addData("wheels:", drive.getWheelPositions());
+            telemetry.update();
             drive.followTrajectory(trajectoryForward);
+            telemetry.addLine("Backward");
+            telemetry.addData("wheels:", drive.getWheelPositions());
+            telemetry.update();
             drive.followTrajectory(trajectoryBackward);
         }
     }
