@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.action.ActionSequence;
+import org.firstinspires.ftc.teamcode.action.ActionSet;
+import org.firstinspires.ftc.teamcode.action.ConditionedAction;
 import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
 import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
@@ -55,23 +57,44 @@ public class ClawSlide {
             clawArmRight);
 
         this.PUT_DOWN_ACTION = new ActionSequence(
-            new TimedUpdateAction(0.2, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
+            new ConditionedAction(
+                () -> this.slideRotate.getLeftPosition() < 600,
+                new ActionSequence(
+                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
+                    new MotorPairAction(this.slideRotate, 600)
+                )
+            ),
+            new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideRotate, 940),
-            new TimedUpdateAction(0.5, () -> this.claw.setRotate(105)));
+            new TimedUpdateAction(0.3, () -> this.claw.setRotate(105)));
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new ActionSequence(
-            new TimedUpdateAction(0.2, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, 0),
+            new ConditionedAction(
+                () -> this.slideRotate.getLeftPosition() < 600,
+                new ActionSequence(
+                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
+                    new MotorPairAction(this.slideRotate, 600)
+                )
+            ),
+            new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideRotate, 945),
             new MotorPairAction(this.slideLift, 1125),
-            new TimedUpdateAction(0.5, () -> this.claw.setRotate(102)));
+            new TimedUpdateAction(0.3, () -> this.claw.setRotate(102)));
 
         this.RETRACT_AND_PULL_UP_ACTION = new ActionSequence(
-            new TimedUpdateAction(0.5, () -> this.claw.setRotate(20)),
+            new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
             new MotorPairAction(this.slideLift, 0),
-            new MotorPairAction(this.slideRotate, 0),
-            new TimedUpdateAction(0.5, () -> this.claw.setRotate(111)));
+            new ConditionedAction(
+                () -> this.slideRotate.getLeftPosition() > 600,
+                new ActionSequence(
+                    new MotorPairAction(this.slideRotate, 600),
+                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(195))
+                )
+            ),
+            new MotorPairAction(this.slideRotate, 0)
+        );
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();
@@ -119,9 +142,9 @@ public class ClawSlide {
         double maxClawAngle = this.getMaxSafeClawAngle();
         double maxSlideAngle = this.getMaxSafeSlideAngle();
         double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
-        AMainTeleOp.addLog("Max Claw Rot:", maxClawAngle);
-        AMainTeleOp.addLog("Max Slide Rot:", maxSlideAngle);
-        AMainTeleOp.addLog("Max Slide Pos:", maxSlidePos);
+        AMainTeleOp.addLog("D: Max Claw Rot:", maxClawAngle);
+        AMainTeleOp.addLog("D: Max Slide Rot:", maxSlideAngle);
+        AMainTeleOp.addLog("D: Max Slide Pos:", maxSlidePos);
         // this.claw.setMaxRot(maxClawAngle - CLAW_ROT_OFFSET);
         // this.slideRotate.setMaxPosition((int)(maxSlideAngle / ROTATE_ANGLE_RATIO));
         // this.slideLift.setMaxPosition((int)(maxSlidePos / LIFT_POSITION_LENGTH_RATIO));
@@ -177,12 +200,14 @@ public class ClawSlide {
         double virtualAngle = -Math.asin(CLAW_ARM_LENGTH * Math.sin(clawAngle) / virtualArm);
         double longMax = Math.toDegrees(Math.acos(-ROTATE_JOINT_HEIGHT / virtualArm) - virtualAngle);
         double shortMax = Math.toDegrees(Math.acos(-ROTATE_JOINT_HEIGHT / slideLength));
-        return Math.min(shortMax, longMax);
+        double maxSlideAngle = Math.min(shortMax, longMax);
+        return maxSlideAngle;
     }
 
     private double getMaxSafeClawAngle() {
         double slideAngle = this.getSlideAngle();
         double slideLength = this.getSlideLength();
-        return 180 + Math.toDegrees(Math.acos((ROTATE_JOINT_HEIGHT + slideLength * Math.cos(slideAngle)) / CLAW_ARM_LENGTH)) - slideAngle;
+        double maxAngle = 180 + Math.toDegrees(Math.acos((ROTATE_JOINT_HEIGHT + slideLength * Math.cos(slideAngle)) / CLAW_ARM_LENGTH)) - slideAngle;
+        return Double.isNaN(maxAngle) ? Claw.MAX_ROT : maxAngle;
     }
 }

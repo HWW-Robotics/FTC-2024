@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.action;
 
-public final class ActionSet implements ActionStage {
+public class ActionSet implements ActionStage {
     private final ActionStage[] actions;
 
     public ActionSet(ActionStage... actions) {

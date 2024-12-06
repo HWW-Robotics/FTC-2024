@@ -4,10 +4,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
     private static final double ROT_RATIO = 250.0;
-    private static final double MIN_ROT = 2;
-    private static final double MAX_ROT = 195;
-    private static final double MIN_CLAW = 8;
-    private static final double MAX_CLAW = 46;
+    public static final double MIN_ROT = 2;
+    public static final double MAX_ROT = 195;
+    public static final double MIN_CLAW = 8;
+    public static final double MAX_CLAW = 46;
     private double maxRot = MAX_ROT;
     private final Servo leftRot, rightRot;
     private final Servo leftClaw, rightClaw;
