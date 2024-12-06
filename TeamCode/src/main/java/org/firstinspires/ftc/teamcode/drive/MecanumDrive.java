@@ -15,10 +15,10 @@ public class MecanumDrive {
         this.rightRear = rightRear;
         this.leftFront = leftFront;
         this.leftRear = leftRear;
-        this.rightFront.setDirection(DcMotor.Direction.REVERSE);
-        this.rightRear.setDirection(DcMotor.Direction.REVERSE);
-        this.leftFront.setDirection(DcMotor.Direction.FORWARD);
-        this.leftRear.setDirection(DcMotor.Direction.FORWARD);
+        this.rightFront.setDirection(DcMotor.Direction.FORWARD);
+        this.rightRear.setDirection(DcMotor.Direction.FORWARD);
+        this.leftFront.setDirection(DcMotor.Direction.REVERSE);
+        this.leftRear.setDirection(DcMotor.Direction.REVERSE);
         this.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -102,6 +102,6 @@ public class MecanumDrive {
         if (speed == 0) {
             return;
         }
-        this.addPowers(speed, speed, -speed, -speed);
+        this.addPowers(-speed, -speed, speed, speed);
     }
 }

@@ -23,7 +23,8 @@ public class AMainTeleOp extends OpMode {
             hardwareMap.get(DcMotor.class, "rightFront"),
             hardwareMap.get(DcMotor.class,"rightRear"),
             hardwareMap.get(DcMotor.class,"leftFront"),
-            hardwareMap.get(DcMotor.class,"leftRear"));
+            hardwareMap.get(DcMotor.class,"leftRear")
+        );
         this.clawSlide = new ClawSlide(
             hardwareMap.get(DcMotor.class, "leftRotation"),
             hardwareMap.get(DcMotor.class, "rightRotation"),
@@ -34,6 +35,7 @@ public class AMainTeleOp extends OpMode {
             hardwareMap.get(Servo.class, "ClawArmLeft"),
             hardwareMap.get(Servo.class, "ClawArmRight")
         );
+        this.clawSlide.claw.closeAll();
     }
 
     @Override
@@ -85,13 +87,9 @@ public class AMainTeleOp extends OpMode {
                     this.clawSlide.slideRotate.setPosition(0);
                     clawActioned = true;
                 }
-                // else if (this.gamepad2.left_stick_x != 0) {
-                //     this.clawSlide.slideRotate.move((int) (this.gamepad2.left_stick_x * 20));
-                //     clawActioned = true;
-                // }
             }
             if (this.gamepad2.left_stick_y != 0) {
-                this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 50));
+                this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 100));
                 clawActioned = true;
             }
         }
@@ -109,7 +107,7 @@ public class AMainTeleOp extends OpMode {
         }
         if (!this.gamepad2.guide) {
             if (this.gamepad2.b) {
-                this.clawSlide.claw.setRotate(90);
+                this.clawSlide.claw.setRotate(118);
                 clawActioned = true;
             } else if (this.gamepad2.y) {
                 this.clawSlide.retractAndPullUp();
