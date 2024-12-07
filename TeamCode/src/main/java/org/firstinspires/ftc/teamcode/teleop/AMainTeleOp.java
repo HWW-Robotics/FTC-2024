@@ -42,6 +42,12 @@ public class AMainTeleOp extends OpMode {
     public void loop() {
         boolean clawActioned = false;
 
+        if (this.gamepad1.x) {
+            this.clawSlide.releaseRestrictions();
+        } else if (this.gamepad1.y) {
+            this.clawSlide.setRestrictions();
+        }
+
         /// Slides
         if (this.gamepad2.guide) {
             clawActioned = true;
