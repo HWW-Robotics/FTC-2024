@@ -55,7 +55,7 @@ public class MotorPair {
     }
 
     public void resetPosition() {
-        this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);z
+        this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.currentTargetPos = 0;
     }
