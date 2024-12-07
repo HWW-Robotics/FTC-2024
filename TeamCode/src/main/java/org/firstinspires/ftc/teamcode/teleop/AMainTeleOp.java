@@ -40,6 +40,8 @@ public class AMainTeleOp extends OpMode {
 
     @Override
     public void loop() {
+        final long startTime = System.nanoTime();
+
         boolean clawActioned = false;
 
         if (this.gamepad1.x) {
@@ -80,19 +82,15 @@ public class AMainTeleOp extends OpMode {
                 this.clawSlide.slideLift.right.setPower(power);
             }
         } else {
-            boolean canSlideRotate = true || this.clawSlide.slideLift.getLeftPosition() < 250;
-            this.telemetry.addData("CanSlideRotate", canSlideRotate);
-            if (canSlideRotate) {
-                if (this.gamepad2.dpad_up) {
-                    this.clawSlide.slideRotate.move(-15);
-                    clawActioned = true;
-                } else if (this.gamepad2.dpad_down) {
-                    this.clawSlide.slideRotate.move(15);
-                    clawActioned = true;
-                } else if (this.gamepad2.dpad_left) {
-                    this.clawSlide.slideRotate.setPosition(0);
-                    clawActioned = true;
-                }
+            if (this.gamepad2.dpad_up) {
+                this.clawSlide.slideRotate.move(-15);
+                clawActioned = true;
+            } else if (this.gamepad2.dpad_down) {
+                this.clawSlide.slideRotate.move(15);
+                clawActioned = true;
+            } else if (this.gamepad2.dpad_left) {
+                this.clawSlide.slideRotate.setPosition(0);
+                clawActioned = true;
             }
             if (this.gamepad2.left_stick_y != 0) {
                 this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 100));
@@ -138,14 +136,13 @@ public class AMainTeleOp extends OpMode {
         this.drive.rotate(this.gamepad1.right_stick_x);
         this.drive.updatePowers();
 
-        this.telemetry.addData("LeftSlideRot", this.clawSlide.slideRotate.getLeftPosition());
-        this.telemetry.addData("RightSlideRot", this.clawSlide.slideRotate.getRightPosition());
+        this.telemetry.addData("SlideRot", this.clawSlide.slideRotate.getLeftPosition());
         this.telemetry.addData("SlideMaxPos", this.clawSlide.slideLift.getMaxPosition());
-        this.telemetry.addData("LeftPosition", this.clawSlide.slideLift.getLeftPosition());
-        this.telemetry.addData("RightPosition", this.clawSlide.slideLift.getRightPosition());
-        this.telemetry.addData("LeftClawRot", this.clawSlide.claw.getLeftRotAngle());
-        this.telemetry.addData("RightClawRot", this.clawSlide.claw.getRightRotAngle());
-        this.telemetry.update();
+        this.telemetry.addData("SlideLift", this.clawSlide.slideLift.getLeftPosition());
+        this.telemetry.addData("ClawRot", this.clawSlide.claw.getLeftRotAngle());
+
+        final long endTime = System.nanoTime();
+        this.telemetry.addData("LOOP DURATION", (double)(endTime - startTime) / 1000);
     }
 
     public static void addLog(String caption, Object data) {

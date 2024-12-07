@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class MotorPair {
     public final DcMotor left, right;
     private int maxPosition;
     private double power;
     private int currentTargetPos;
-    public int resetting = 0;
-    private ElapsedTime resetTimer = new ElapsedTime();
 
     public MotorPair(int maxPosition, double power, DcMotor left, DcMotor right) {
         this(maxPosition, power, left, right, DcMotor.Direction.FORWARD, DcMotor.Direction.REVERSE);
@@ -53,13 +49,13 @@ public class MotorPair {
 
     public void setMaxPosition(int pos) {
         this.maxPosition = pos;
-        if (pos < this.maxPosition) {
+        if (this.maxPosition < this.currentTargetPos) {
             this.setPosition(this.currentTargetPos);
         }
     }
 
     public void resetPosition() {
-        this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);z
         this.right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.currentTargetPos = 0;
     }

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.MotorPair;
 
+@Disabled
 @TeleOp(name = "SlideControl")
 public class SlideControl extends OpMode {
     MotorPair slideRotate, slideLift;

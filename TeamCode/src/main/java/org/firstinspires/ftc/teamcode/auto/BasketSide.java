@@ -36,8 +36,7 @@ public class BasketSide extends OpMode {
         this.telemetry.addLine("Building Sequence");
         this.telemetry.update();
 
-        TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-            .addTemporalMarker(this.clawSlide.claw::openAll);
+        TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0));
         this.addPutSequence(builder);
         builder
             .lineToLinearHeading(new Pose2d(4.24,16.79, Math.toRadians(0)))
@@ -49,10 +48,10 @@ public class BasketSide extends OpMode {
             .lineToLinearHeading(new Pose2d(12.94, 26.1, Math.toRadians(2.32)));
         this.addPickAndPutSequence(builder);
 
-        builder
-            .lineToLinearHeading(new Pose2d(3.57, 23.08, Math.toRadians(22.7)))
-            .lineToLinearHeading(new Pose2d(17.45, 27.07, Math.toRadians(23.5)));
-        this.addPickAndPutSequence(builder);
+        // builder
+        //     .lineToLinearHeading(new Pose2d(3.57, 23.08, Math.toRadians(22.7)))
+        //     .lineToLinearHeading(new Pose2d(17.45, 27.07, Math.toRadians(23.5)));
+        // this.addPickAndPutSequence(builder);
 
         builder.lineToLinearHeading(new Pose2d(3.0, 23.0, Math.toRadians(0)));
 
