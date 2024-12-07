@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
 @Autonomous(name = "BasketSide")
 public class BasketSide extends OpMode {
@@ -34,104 +35,31 @@ public class BasketSide extends OpMode {
 
         this.telemetry.addLine("Building Sequence");
         this.telemetry.update();
-        this.sequence = drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-            .addTemporalMarker(clawSlide.claw::openAll)
-            .lineTo(new Vector2d(14.24,-16.79))
-            // begin pick
-            .addTemporalMarker(clawSlide::putDown)
-            .waitSeconds(4)
-            .addTemporalMarker(clawSlide.claw::closeAll)
-            .waitSeconds(2)
-            .addTemporalMarker(clawSlide::retractAndPullUp)
-            .waitSeconds(4)
-            // after pick
-            .lineTo(new Vector2d(14.0, -16.79))
-            .turn(Math.toRadians(138.3))
-            .addTemporalMarker(() -> {
-                clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION);
-            })
-            .waitSeconds(5)
-            .strafeTo(new Vector2d(1.9, -26.62))
-            .addTemporalMarker(() -> {
-                clawSlide.claw.setRotate(195);
-            })
-            .waitSeconds(3)
-            .addTemporalMarker(clawSlide.claw::openAll)
-            .waitSeconds(2)
-            .addTemporalMarker(() -> {
-                clawSlide.claw.setRotate(0);
-            })
-            .waitSeconds(2)
-            .addTemporalMarker(() -> {
-                clawSlide.slideLift.setPosition(0);
-            })
-            .waitSeconds(3)
-            //
-            // .lineToLinearHeading(new Pose2d(-1.4, -26.62, Math.toRadians(2.32)))
-            // .splineTo(new Vector2d(-12.94, -26.1), 0)
-            // // begin pick
-            // .addTemporalMarker(clawSlide::putDown)
-            // .waitSeconds(5)
-            // .addTemporalMarker(clawSlide.claw::closeAll)
-            // .waitSeconds(3)
-            // .addTemporalMarker(clawSlide::retractAndPullUp)
-            // .waitSeconds(5)
-            // // after pick
-            // .lineToLinearHeading(new Pose2d(-14.24, -16.79, Math.toRadians(138.3)))
-            // .addTemporalMarker(() -> {
-            //     clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION);
-            // })
-            // .waitSeconds(5)
-            // .strafeTo(new Vector2d(-1.9, -26.62))
-            // .addTemporalMarker(() -> {
-            //     clawSlide.claw.setRotate(195);
-            // })
-            // .waitSeconds(3)
-            // .addTemporalMarker(clawSlide.claw::openAll)
-            // .waitSeconds(2)
-            // .addTemporalMarker(() -> {
-            //     clawSlide.claw.setRotate(0);
-            // })
-            // .waitSeconds(2)
-            // .addTemporalMarker(() -> {
-            //     clawSlide.slideLift.setPosition(0);
-            // })
-            // .waitSeconds(3)
-            //
-            // .lineToLinearHeading(new Pose2d(-3.57, -23.08, Math.toRadians(22.7)))
-            // .lineToLinearHeading(new Pose2d(-17.45, -27.07, Math.toRadians(23.5)))
-            // // begin pick
-            // .addTemporalMarker(clawSlide::putDown)
-            // .waitSeconds(5)
-            // .addTemporalMarker(clawSlide.claw::closeAll)
-            // .waitSeconds(3)
-            // .addTemporalMarker(clawSlide::retractAndPullUp)
-            // .waitSeconds(5)
-            // // after pick
-            // .lineToLinearHeading(new Pose2d(-14.24, -16.79, Math.toRadians(138.3)))
-            // .addTemporalMarker(() -> {
-            //     clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION);
-            // })
-            // .waitSeconds(5)
-            // .strafeTo(new Vector2d(-1.9, -26.62))
-            // .addTemporalMarker(() -> {
-            //     clawSlide.claw.setRotate(195);
-            // })
-            // .waitSeconds(3)
-            // .addTemporalMarker(clawSlide.claw::openAll)
-            // .waitSeconds(2)
-            // .addTemporalMarker(() -> {
-            //     clawSlide.claw.setRotate(0);
-            // })
-            // .waitSeconds(2)
-            // .addTemporalMarker(() -> {
-            //     clawSlide.slideLift.setPosition(0);
-            // })
-            // .waitSeconds(3)
-            .build();
+
+        TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
+            .addTemporalMarker(this.clawSlide.claw::openAll);
+        this.addPutSequence(builder);
+        builder
+            .lineToLinearHeading(new Pose2d(4.24,16.79, Math.toRadians(0)))
+            .lineToLinearHeading(new Pose2d(14.24,16.79, Math.toRadians(0)));
+        this.addPickAndPutSequence(builder);
+
+        builder
+            .lineToLinearHeading(new Pose2d(1.4, 26.62, Math.toRadians(2.3)))
+            .lineToLinearHeading(new Pose2d(12.94, 26.1, Math.toRadians(2.32)));
+        this.addPickAndPutSequence(builder);
+
+        builder
+            .lineToLinearHeading(new Pose2d(3.57, 23.08, Math.toRadians(22.7)))
+            .lineToLinearHeading(new Pose2d(17.45, 27.07, Math.toRadians(23.5)));
+        this.addPickAndPutSequence(builder);
+
+        builder.lineToLinearHeading(new Pose2d(3.0, 23.0, Math.toRadians(0)));
+
+        this.sequence = builder.build();
 
         this.clawSlide.claw.closeAll();
-        this.telemetry.addLine("Inited");
+        this.telemetry.addLine("Initialized");
         this.telemetry.update();
     }
 
@@ -146,13 +74,43 @@ public class BasketSide extends OpMode {
     public void loop() {
         this.drive.update();
         this.clawSlide.update();
-        if (!this.drive.isBusy()) {
-            //
-        }
+
+        this.telemetry.addData("isBusy", this.drive.isBusy());
+        this.telemetry.addData("inAction", this.clawSlide.inAction());
 
         Pose2d pos = this.drive.getPoseEstimate();
         this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
         this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
         this.telemetry.update();
+    }
+
+    private void addPickAndPutSequence(TrajectorySequenceBuilder builder) {
+        // begin pick
+        builder
+            .addTemporalMarker(clawSlide::putDown)
+            .waitSeconds(2.5)
+            .addTemporalMarker(clawSlide.claw::closeAll)
+            .waitSeconds(0.8)
+            .addTemporalMarker(clawSlide::retractAndPullUp)
+            .waitSeconds(2.5);
+        this.addPutSequence(builder);
+    }
+
+    private void addPutSequence(TrajectorySequenceBuilder builder) {
+        // after pick
+        builder
+            .lineToLinearHeading(new Pose2d(14.0, 16.79, Math.toRadians(138.3)))
+            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(105))
+            .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION))
+            .waitSeconds(2)
+            .lineTo(new Vector2d(1.9, 26.62))
+            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(195))
+            .waitSeconds(1)
+            .addTemporalMarker(this.clawSlide.claw::openAll)
+            .waitSeconds(0.3)
+            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(100))
+            .waitSeconds(0.3)
+            .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(0))
+            .waitSeconds(1.5);
     }
 }

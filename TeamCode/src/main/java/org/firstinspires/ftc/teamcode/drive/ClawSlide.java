@@ -35,6 +35,7 @@ public class ClawSlide {
     public final MotorPair slideRotate, slideLift;
     public final Claw claw;
     private ActionSequence action = null;
+    private boolean restricted = true;
 
     public ClawSlide(
         DcMotor leftRotation, DcMotor rightRotation, DcMotor leftSlide, DcMotor rightSlide,
@@ -132,6 +133,14 @@ public class ClawSlide {
         this.setAction(this.RETRACT_AND_PULL_UP_ACTION);
     }
 
+    public void releaseRestrictions() {
+        this.restricted = false;
+    }
+
+    public void setRestrictions() {
+        this.restricted = true;
+    }
+
     public void update() {
         if (this.action != null) {
             this.action.update();
@@ -139,22 +148,34 @@ public class ClawSlide {
                 this.action = null;
             }
         }
-        double maxClawAngle = this.getMaxSafeClawAngle();
-        double maxSlideAngle = this.getMaxSafeSlideAngle();
-        double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
-        AMainTeleOp.addLog("D: Max Claw Rot:", maxClawAngle);
-        AMainTeleOp.addLog("D: Max Slide Rot:", maxSlideAngle);
-        AMainTeleOp.addLog("D: Max Slide Pos:", maxSlidePos);
-        // this.claw.setMaxRot(maxClawAngle - CLAW_ROT_OFFSET);
-        // this.slideRotate.setMaxPosition((int)(maxSlideAngle / ROTATE_ANGLE_RATIO));
-        // this.slideLift.setMaxPosition((int)(maxSlidePos / LIFT_POSITION_LENGTH_RATIO));
+        AMainTeleOp.addLog("Position Restriction", this.restricted);
+        if (this.restricted) {
+            double maxClawAngle = this.getMaxSafeClawAngle();
+            double maxSlideAngle = this.getMaxSafeSlideAngle();
+            double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
+            AMainTeleOp.addLog("D: Max Claw Rot:", maxClawAngle);
+            AMainTeleOp.addLog("D: Max Slide Rot:", maxSlideAngle);
+            AMainTeleOp.addLog("D: Max Slide Pos:", maxSlidePos);
+            // this.claw.setMaxRot(maxClawAngle - CLAW_ROT_OFFSET);
+            // this.slideRotate.setMaxPosition((int)(maxSlideAngle / ROTATE_ANGLE_RATIO));
+            // this.slideLift.setMaxPosition((int)(maxSlidePos / LIFT_POSITION_LENGTH_RATIO));
 
-        final double horizonRatio = Math.sin(this.slideRotate.getLeftPosition() * ROTATE_ANGLE_RATIO * Math.PI / 180);
-        int maxPos = LIFT_MAX_POSITION;
-        if (horizonRatio > 0) {
-            maxPos = Math.min(maxPos, (int)(LIFT_MAX_POSITION_HORIZON / horizonRatio));
+            final double horizonRatio = Math.sin(Math.toRadians(this.slideRotate.getLeftPosition() * ROTATE_ANGLE_RATIO));
+            int maxPos = LIFT_MAX_POSITION;
+            if (horizonRatio > 0) {
+                maxPos = Math.min(maxPos, (int) (LIFT_MAX_POSITION_HORIZON / horizonRatio));
+            }
+            this.slideLift.setMaxPosition(maxPos);
+        } else {
+            this.claw.setMaxRot(Claw.MAX_ROT);
+            this.slideRotate.setMaxPosition(2000);
+            final double horizonRatio = Math.sin(Math.toRadians(this.slideRotate.getLeftPosition() * ROTATE_ANGLE_RATIO));
+            int maxPos = LIFT_MAX_POSITION;
+            if (horizonRatio > 0) {
+                maxPos = Math.min(maxPos, (int) (LIFT_MAX_POSITION_HORIZON / horizonRatio));
+            }
+            this.slideLift.setMaxPosition(maxPos);
         }
-        this.slideLift.setMaxPosition(maxPos);
 
         this.slideRotate.update();
         this.slideLift.update();
@@ -183,12 +204,10 @@ public class ClawSlide {
         double horizonRatio = Math.sin(slideAngle);
         double maxPos = horizonRatio > 0 ? LIFT_MAX_HORIZON_LENGTH / horizonRatio : LIFT_MAX_POSITION_LENGTH;
         double longMax = b + Math.sqrt(b * b - CLAW_ARM_LENGTH * CLAW_ARM_LENGTH + c * c);
-        maxPos = Math.min(maxPos, longMax);
+        maxPos = min(maxPos, longMax);
         if (virtualAngle < 0 && slideAngle > Math.PI / 2) {
             double shortMax = ROTATE_JOINT_HEIGHT / -Math.cos(slideAngle);
-            if (shortMax < longMax) {
-                maxPos = Math.min(maxPos, shortMax);
-            }
+            maxPos = min(maxPos, shortMax);
         }
         return maxPos;
     }
@@ -200,14 +219,28 @@ public class ClawSlide {
         double virtualAngle = -Math.asin(CLAW_ARM_LENGTH * Math.sin(clawAngle) / virtualArm);
         double longMax = Math.toDegrees(Math.acos(-ROTATE_JOINT_HEIGHT / virtualArm) - virtualAngle);
         double shortMax = Math.toDegrees(Math.acos(-ROTATE_JOINT_HEIGHT / slideLength));
-        double maxSlideAngle = Math.min(shortMax, longMax);
-        return maxSlideAngle;
+        double maxSlideAngle = min(shortMax, longMax);
+        return Double.isNaN(maxSlideAngle) ? ROTATE_MAX_POSITION * ROTATE_ANGLE_RATIO : maxSlideAngle;
     }
 
     private double getMaxSafeClawAngle() {
         double slideAngle = this.getSlideAngle();
         double slideLength = this.getSlideLength();
         double maxAngle = 180 + Math.toDegrees(Math.acos((ROTATE_JOINT_HEIGHT + slideLength * Math.cos(slideAngle)) / CLAW_ARM_LENGTH)) - slideAngle;
-        return Double.isNaN(maxAngle) ? Claw.MAX_ROT : maxAngle;
+        return Double.isNaN(maxAngle) ? Claw.MAX_ROT + CLAW_ROT_OFFSET : maxAngle;
+    }
+
+    private static double min(double a, double b) {
+        if (Double.isNaN(a)) {
+            return b;
+        }
+        return a > b ? b : a;
+    }
+
+    private static double max(double a, double b) {
+        if (Double.isNaN(a)) {
+            return b;
+        }
+        return a < b ? b : a;
     }
 }
