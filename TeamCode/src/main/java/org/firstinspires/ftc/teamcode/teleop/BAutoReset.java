@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@TeleOp(name = "BAutoReset")
 public class BAutoReset extends OpMode {
     static final int ROT_ADJUST_SPEED = 10;
     static final double ROT_ADJUST_TICK_DUR = 10; // in ms

@@ -101,15 +101,13 @@ public class BasketSide extends OpMode {
             .lineToLinearHeading(new Pose2d(14.0, 16.79, Math.toRadians(138.3)))
             .addTemporalMarker(() -> this.clawSlide.claw.setRotate(105))
             .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION))
-            .waitSeconds(2)
+            .waitSeconds(1.5)
             .lineTo(new Vector2d(1.9, 26.62))
-            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(195))
-            .waitSeconds(1)
             .addTemporalMarker(this.clawSlide.claw::openAll)
             .waitSeconds(0.3)
-            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(100))
-            .waitSeconds(0.3)
+            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(20))
+            .waitSeconds(0.2)
             .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(0))
-            .waitSeconds(1.5);
+            .waitSeconds(1.0);
     }
 }

@@ -16,7 +16,7 @@ public class ClawSlide {
 
     public static final int ROTATE_MAX_POSITION = 1090;
     private static final double ROTATE_ANGLE_RATIO = 90.0 / 980;
-    public static final int LIFT_MAX_POSITION = 2900;
+    public static final int LIFT_MAX_POSITION = 2930;
     private static final int LIFT_MAX_POSITION_HORIZON = 2150;
 
     private static final double ROTATE_JOINT_HEIGHT = 9.7;
@@ -58,28 +58,14 @@ public class ClawSlide {
             clawArmRight);
 
         this.PUT_DOWN_ACTION = new ActionSequence(
-            new MotorPairAction(this.slideLift, 0),
-            new ConditionedAction(
-                () -> this.slideRotate.getLeftPosition() < 600,
-                new ActionSequence(
-                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
-                    new MotorPairAction(this.slideRotate, 600)
-                )
-            ),
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
-            new MotorPairAction(this.slideRotate, 940),
-            new TimedUpdateAction(0.3, () -> this.claw.setRotate(105)));
+            new MotorPairAction(this.slideLift, 0),
+            new MotorPairAction(this.slideRotate, 938),
+            new TimedUpdateAction(0.3, () -> this.claw.setRotate(113)));
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new ActionSequence(
-            new MotorPairAction(this.slideLift, 0),
-            new ConditionedAction(
-                () -> this.slideRotate.getLeftPosition() < 600,
-                new ActionSequence(
-                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
-                    new MotorPairAction(this.slideRotate, 600)
-                )
-            ),
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
+            new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 945),
             new MotorPairAction(this.slideLift, 1125),
             new TimedUpdateAction(0.3, () -> this.claw.setRotate(102)));

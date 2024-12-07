@@ -114,7 +114,7 @@ public class AMainTeleOp extends OpMode {
         }
         if (!this.gamepad2.guide) {
             if (this.gamepad2.b) {
-                this.clawSlide.claw.setRotate(120);
+                this.clawSlide.claw.setRotate(110);
                 clawActioned = true;
             } else if (this.gamepad2.y) {
                 this.clawSlide.retractAndPullUp();
@@ -148,7 +148,7 @@ public class AMainTeleOp extends OpMode {
         this.prevGamepad2.copy(this.gamepad2);
 
         final long endTime = System.nanoTime();
-        this.telemetry.addData("LOOP DURATION", (double)(endTime - startTime) / 1000);
+        this.telemetry.addData("LOOP DURATION", "%.02fµs", (double)(endTime - startTime) / 1000);
     }
 
     public static void addLog(String caption, Object data) {
