@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.drive.ClawSlide;
@@ -12,6 +13,8 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 public class AMainTeleOp extends OpMode {
     public static AMainTeleOp INSTANCE = null;
     static final double MAX_DRIVE_POWER = 0.5;
+    public Gamepad prevGamepad1 = new Gamepad();
+    public Gamepad prevGamepad2 = new Gamepad();
     MecanumDrive drive;
     ClawSlide clawSlide;
 
@@ -93,25 +96,25 @@ public class AMainTeleOp extends OpMode {
                 clawActioned = true;
             }
             if (this.gamepad2.left_stick_y != 0) {
-                this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 100));
+                this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 120));
                 clawActioned = true;
             }
         }
 
         /// Claws
-        if (this.gamepad2.left_bumper) {
+        if (!this.prevGamepad2.left_bumper && this.gamepad2.left_bumper) {
             this.clawSlide.claw.closeLeft();
-        } else {
+        } else if (this.prevGamepad2.left_bumper && !this.gamepad2.left_bumper) {
             this.clawSlide.claw.openLeft();
         }
-        if (this.gamepad2.right_bumper) {
+        if (!this.prevGamepad2.right_bumper && this.gamepad2.right_bumper) {
             this.clawSlide.claw.closeRight();
-        } else {
+        } else if (this.prevGamepad2.right_bumper && !this.gamepad2.right_bumper) {
             this.clawSlide.claw.openRight();
         }
         if (!this.gamepad2.guide) {
             if (this.gamepad2.b) {
-                this.clawSlide.claw.setRotate(118);
+                this.clawSlide.claw.setRotate(120);
                 clawActioned = true;
             } else if (this.gamepad2.y) {
                 this.clawSlide.retractAndPullUp();
@@ -140,6 +143,9 @@ public class AMainTeleOp extends OpMode {
         this.telemetry.addData("SlideMaxPos", this.clawSlide.slideLift.getMaxPosition());
         this.telemetry.addData("SlideLift", this.clawSlide.slideLift.getLeftPosition());
         this.telemetry.addData("ClawRot", this.clawSlide.claw.getLeftRotAngle());
+
+        this.prevGamepad1.copy(this.gamepad1);
+        this.prevGamepad2.copy(this.gamepad2);
 
         final long endTime = System.nanoTime();
         this.telemetry.addData("LOOP DURATION", (double)(endTime - startTime) / 1000);

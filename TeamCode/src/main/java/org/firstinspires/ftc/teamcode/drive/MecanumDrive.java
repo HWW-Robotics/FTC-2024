@@ -89,7 +89,7 @@ public class MecanumDrive {
         if (power == 0) {
             return;
         }
-        double yaw = Math.atan2(y, x) - Math.PI / 4;
+        double yaw = Math.atan2(-y, x) - Math.PI / 4;
         double xPower = Math.sin(yaw) * power;
         double yPower = Math.cos(yaw) * power;
         this.addPowers(yPower, xPower, xPower, yPower);

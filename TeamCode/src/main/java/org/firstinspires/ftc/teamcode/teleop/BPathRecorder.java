@@ -8,6 +8,7 @@ import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.WebHandlerManager;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -25,12 +26,6 @@ public class BPathRecorder extends AMainTeleOp {
     static final List<RecordNode> nodes = new ArrayList<>();
 
     SampleMecanumDrive driver;
-
-    boolean last1X = false;
-    boolean last2A = false;
-    boolean last2B = false;
-    boolean last2X = false;
-    boolean last2Y = false;
 
     @Override
     public void init() {
@@ -51,13 +46,16 @@ public class BPathRecorder extends AMainTeleOp {
         this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
         this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
 
+        Gamepad prevGamepad1 = new Gamepad();
+        Gamepad prevGamepad2 = new Gamepad();
+        prevGamepad1.copy(this.prevGamepad1);
+        prevGamepad2.copy(this.prevGamepad2);
         super.loop();
 
-        boolean updatedPose = !this.last1X && this.gamepad1.x;
+        boolean updatedPose = !prevGamepad1.a && this.gamepad1.a;
         if (updatedPose) {
             nodes.add(new PoseNode(pos));
         }
-        this.last1X = this.gamepad1.x;
 
         if (!updatedPose) {
             PoseNode lastNode = getLastPoseNode();
@@ -70,22 +68,18 @@ public class BPathRecorder extends AMainTeleOp {
                 lastNode.pos = pos;
             }
         }
-        if (!this.last2A && this.gamepad2.a) {
+        if (!prevGamepad2.a && this.gamepad2.a) {
             nodes.add(new ActionNode("A"));
         }
-        if (!this.last2B && this.gamepad2.b) {
+        if (!prevGamepad2.b && this.gamepad2.b) {
             nodes.add(new ActionNode("B"));
         }
-        if (!this.last2X && this.gamepad2.x) {
+        if (!prevGamepad2.x && this.gamepad2.x) {
             nodes.add(new ActionNode("X"));
         }
-        if (!this.last2Y && this.gamepad2.y) {
+        if (!prevGamepad2.y && this.gamepad2.y) {
             nodes.add(new ActionNode("Y"));
         }
-        this.last2A = this.gamepad2.a;
-        this.last2B = this.gamepad2.b;
-        this.last2X = this.gamepad2.x;
-        this.last2Y = this.gamepad2.y;
     }
 
     @Nullable
