@@ -60,6 +60,10 @@ public class MotorPair {
         this.currentTargetPos = 0;
     }
 
+    public int getTargetPosition() {
+        return this.currentTargetPos;
+    }
+
     public void setPosition(int pos) {
         this.currentTargetPos = Math.min(Math.max(pos, 0), this.maxPosition);
     }

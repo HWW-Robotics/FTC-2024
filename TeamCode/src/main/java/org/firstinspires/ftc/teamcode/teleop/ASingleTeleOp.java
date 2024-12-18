@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
-@TeleOp(name = "AMainTeleOp")
-public class AMainTeleOp extends OpMode {
+@TeleOp(name = "ASingleTeleOp")
+public class ASingleTeleOp extends OpMode {
     static final double MAX_DRIVE_POWER = 0.5;
     public Gamepad prevGamepad1 = new Gamepad();
     public Gamepad prevGamepad2 = new Gamepad();
@@ -93,19 +93,39 @@ public class AMainTeleOp extends OpMode {
                 this.clawSlide.slideLift.right.setPower(power);
             }
         } else {
+            boolean slideActioned = false;
             if (this.gamepad2.dpad_up) {
                 this.clawSlide.slideRotate.move(-15);
-                clawActioned = true;
+                slideActioned = true;
             } else if (this.gamepad2.dpad_down) {
                 this.clawSlide.slideRotate.move(15);
-                clawActioned = true;
+                slideActioned = true;
             } else if (this.gamepad2.dpad_left) {
                 this.clawSlide.slideRotate.setPosition(0);
-                clawActioned = true;
+                slideActioned = true;
             }
             if (this.gamepad2.left_stick_y != 0) {
                 this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 120));
-                clawActioned = true;
+                slideActioned = true;
+            }
+            clawActioned = clawActioned || slideActioned;
+            if (!slideActioned) {
+                if (this.gamepad1.left_bumper) {
+                    if (this.clawSlide.slideRotate.getTargetPosition() > 5) {
+                        this.clawSlide.slideRotate.move(-10);
+                    } else {
+                        this.clawSlide.slideLift.move(120);
+                    }
+                } else if (this.gamepad1.left_trigger >= 0.5) {
+                    if (this.clawSlide.slideLift.getTargetPosition() > 50) {
+                        this.clawSlide.slideLift.move(-120);
+                    } else {
+                        this.clawSlide.slideRotate.setPosition(980);
+                    }
+                } else if (this.prevGamepad1.left_bumper || this.prevGamepad1.left_trigger < 0.5) {
+                    this.clawSlide.slideLift.setPosition(this.clawSlide.slideLift.getLeftPosition());
+                    this.clawSlide.slideRotate.setPosition(this.clawSlide.slideRotate.getLeftPosition());
+                }
             }
         }
 

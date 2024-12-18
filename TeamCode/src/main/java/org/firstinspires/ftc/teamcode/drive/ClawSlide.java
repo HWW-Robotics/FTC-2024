@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.action.ActionSequence;
 import org.firstinspires.ftc.teamcode.action.ActionSet;
 import org.firstinspires.ftc.teamcode.action.ConditionedAction;
 import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
-import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
 
 public class ClawSlide {
     private static final double ROTATE_POWER = 0.3;
@@ -134,14 +134,14 @@ public class ClawSlide {
                 this.action = null;
             }
         }
-        AMainTeleOp.addLog("Position Restriction", this.restricted);
+        GlobalStorage.addData("Position Restriction", this.restricted);
         if (this.restricted) {
             double maxClawAngle = this.getMaxSafeClawAngle();
             double maxSlideAngle = this.getMaxSafeSlideAngle();
             double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
-            AMainTeleOp.addLog("D: Max Claw Rot:", maxClawAngle);
-            AMainTeleOp.addLog("D: Max Slide Rot:", maxSlideAngle);
-            AMainTeleOp.addLog("D: Max Slide Pos:", maxSlidePos);
+            GlobalStorage.addData("D: Max Claw Rot:", maxClawAngle);
+            GlobalStorage.addData("D: Max Slide Rot:", maxSlideAngle);
+            GlobalStorage.addData("D: Max Slide Pos:", maxSlidePos);
             // this.claw.setMaxRot(maxClawAngle - CLAW_ROT_OFFSET);
             // this.slideRotate.setMaxPosition((int)(maxSlideAngle / ROTATE_ANGLE_RATIO));
             // this.slideLift.setMaxPosition((int)(maxSlidePos / LIFT_POSITION_LENGTH_RATIO));
