@@ -24,6 +24,11 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import static com.qualcomm.robotcore.util.TypeConversion.byteArrayToInt;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
@@ -48,7 +53,7 @@ import java.util.Arrays;
         description ="goBILDA® Pinpoint Odometry Computer (IMU Sensor Fusion for 2 Wheel Odometry)"
         )
 
-public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
+public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> implements Localizer {
 
     private int deviceStatus   = 0;
     private int loopTime       = 0;
@@ -254,6 +259,7 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
     /**
      * Call this once per loop to read new data from the Odometry Computer. Data will only update once this is called.
      */
+    @Override
     public void update(){
         byte[] bArr   = deviceClient.read(Register.BULK_READ.bVal, 40);
         deviceStatus  = byteArrayToInt(Arrays.copyOfRange  (bArr, 0, 4),  ByteOrder.LITTLE_ENDIAN);
@@ -512,5 +518,29 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
                 yVelocity,
                 AngleUnit.RADIANS,
                 hVelocity);
+    }
+
+
+    @NonNull
+    @Override
+    public Pose2d getPoseEstimate() {
+        final Pose2D pos = this.getPosition();
+        double heading = pos.getHeading(AngleUnit.RADIANS);
+        if (heading < 0) {
+            heading += Math.PI * 2;
+        }
+        return new Pose2d(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), heading);
+    }
+
+    @Override
+    public void setPoseEstimate(Pose2d pos) {
+        this.setPosition(new Pose2D(DistanceUnit.INCH, pos.getX(), pos.getY(), AngleUnit.RADIANS, pos.getHeading()));
+    }
+
+    @Nullable
+    @Override
+    public Pose2d getPoseVelocity() {
+        final Pose2D vel = this.getVelocity();
+        return new Pose2d(vel.getX(DistanceUnit.INCH), vel.getY(DistanceUnit.INCH), vel.getHeading(AngleUnit.RADIANS));
     }
 }

@@ -10,8 +10,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.WebHandlerManager;
 import fi.iki.elonen.NanoHTTPD;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -24,12 +22,10 @@ public class BPathRecorder extends AMainTeleOp {
 
     static final List<RecordNode> nodes = new ArrayList<>();
 
-    SampleMecanumDrive driver;
-
     @Override
     public void init() {
         super.init();
-        this.driver = new SampleMecanumDrive(hardwareMap);
+        this.driver.setPoseEstimate(new Pose2d(0, 0, 0));
 
         nodes.clear();
         nodes.add(new PoseNode(this.driver.getPoseEstimate()));
@@ -40,19 +36,17 @@ public class BPathRecorder extends AMainTeleOp {
 
     @Override
     public void loop() {
-        this.driver.updatePoseEstimate();
-        Pose2d pos = this.driver.getPoseEstimate();
-
         this.telemetry.addData("Nodes", nodes.size());
         this.telemetry.addLine();
-        this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
-        this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
+
+        super.loop();
+
+        Pose2d pos = this.driver.getPoseEstimate();
 
         Gamepad prevGamepad1 = new Gamepad();
         Gamepad prevGamepad2 = new Gamepad();
         prevGamepad1.copy(this.prevGamepad1);
         prevGamepad2.copy(this.prevGamepad2);
-        super.loop();
 
         recordRotorPos("slideRot", this.clawSlide.slideRotate.getTargetPosition());
         recordRotorPos("slideLift", this.clawSlide.slideLift.getTargetPosition());
@@ -63,6 +57,8 @@ public class BPathRecorder extends AMainTeleOp {
         RecordNode lastNode = nodes.get(nodes.size() - 1);
         if (!prevGamepad1.a && this.gamepad1.a) {
             nodes.add(new PoseNode(pos));
+            nodes.add(new LogNode("ManualSave", true));
+            nodes.add(new PoseNode(pos));
         } else {
             PoseNode lastPos = lastNode instanceof PoseNode ? (PoseNode) lastNode : null;
             Pose2d last2Pos = getSecondLastPose();
@@ -70,10 +66,21 @@ public class BPathRecorder extends AMainTeleOp {
                 if (last2Pos == null || isPoseMoved(pos, last2Pos) || isPoseTurned(pos, last2Pos)) {
                     nodes.add(new PoseNode(pos));
                 }
-            } else if ((isPoseMoved(lastPos.pos, last2Pos) && isPoseTurned(pos, lastPos.pos)) || (isPoseTurned(lastPos.pos, last2Pos) && isPoseMoved(pos, lastPos.pos))) {
-                nodes.add(new PoseNode(pos));
             } else {
-                lastPos.pos = pos;
+                boolean lastMoved = isPoseMoved(lastPos.pos, last2Pos);
+                boolean lastTurned = isPoseTurned(lastPos.pos, last2Pos);
+                boolean moved = isPoseMoved(lastPos.pos, pos);
+                boolean turned = isPoseTurned(lastPos.pos, pos);
+                if ((lastMoved && lastTurned) || (lastMoved && turned) || (lastTurned && moved)) {
+                    if (lastMoved) {
+                        lastPos.pos = new Pose2d(lastPos.pos.getX(), lastPos.pos.getY(), last2Pos.getHeading());
+                    } else {
+                        lastPos.pos = new Pose2d(last2Pos.getX(), last2Pos.getY(), lastPos.pos.getHeading());
+                    }
+                    nodes.add(new PoseNode(pos));
+                } else {
+                    lastPos.pos = pos;
+                }
             }
         }
         if (!prevGamepad2.a && this.gamepad2.a) {
@@ -91,11 +98,15 @@ public class BPathRecorder extends AMainTeleOp {
     }
 
     static boolean isPoseMoved(Pose2d a, Pose2d b) {
-        return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY()) >= 1;
+        double x = a.getX() - b.getX();
+        double y = a.getY() - b.getY();
+        return Math.abs(x) + Math.abs(y) >= 1;
     }
 
     static boolean isPoseTurned(Pose2d a, Pose2d b) {
-        return Math.abs(Math.abs(a.getHeading() - b.getHeading() + Math.PI * 2) % (Math.PI * 2) - Math.PI * 2) > 0.1;
+        final double MAX_DIFF = Math.toRadians(1.0);
+        double diff = Math.abs(a.getHeading() - b.getHeading() + Math.PI * 2) % (Math.PI * 2);
+        return MAX_DIFF < diff && diff < Math.PI * 2 - MAX_DIFF;
     }
 
     static void recordRotorPos(String name, double pos) {
@@ -192,9 +203,9 @@ class PoseNode extends RecordNode {
     String getType() { return "Pose2d"; }
     @Override
     void saveData(Map<String, Object> data) {
-        data.put("x", pos.getX());
-        data.put("y", pos.getY());
-        data.put("heading", Math.toDegrees(pos.getHeading()));
+        data.put("x", String.format("%.3f", pos.getX()));
+        data.put("y", String.format("%.3f", pos.getY()));
+        data.put("heading", String.format("%.2f", Math.toDegrees(pos.getHeading())));
     }
 }
 

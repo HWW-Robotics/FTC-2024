@@ -24,6 +24,7 @@ public class BasketSide extends OpMode {
     public void init() {
         GlobalStorage.onInit(this);
         this.driver = GlobalStorage.getOrCreateDriver(hardwareMap);
+        this.driver.setPoseEstimate(new Pose2d(0, 0, 0));
         this.clawSlide = new ClawSlide(
             hardwareMap.get(DcMotor.class, "leftRotation"),
             hardwareMap.get(DcMotor.class, "rightRotation"),
@@ -40,18 +41,16 @@ public class BasketSide extends OpMode {
 
         TrajectorySequenceBuilder builder = driver.trajectorySequenceBuilder(new Pose2d(0, 0, 0));
         builder
-            .lineToLinearHeading(new Pose2d(19.018179071709294,1.576220592203204, Math.toRadians(1.082138299942021)))
-            .turn(Math.toRadians(130.1527624726295 - 1.082138299942021));
+            .lineToLinearHeading(new Pose2d(6,13, Math.toRadians(0)));
         this.addPutSequence(builder);
+
         builder
-            .lineToLinearHeading(new Pose2d(7.229695083379551,14.452337327408559, Math.toRadians(358.5799114108084)))
-            .turn(Math.toRadians((358.5799114108084 - 360) - 1.9987170100207508));
+            .lineToLinearHeading(new Pose2d(14,15.08, Math.toRadians(0)));
         this.addPickAndPutSequence(builder);
-        //
-        // builder
-        //     .lineToLinearHeading(new Pose2d(1.4, 26.62, Math.toRadians(2.3)))
-        //     .lineToLinearHeading(new Pose2d(12.94, 26.1, Math.toRadians(2.32)));
-        // this.addPickAndPutSequence(builder);
+
+        builder
+            .lineToLinearHeading(new Pose2d(14, 25.66, Math.toRadians(0)));
+        this.addPickAndPutSequence(builder);
 
         // builder
         //     .lineToLinearHeading(new Pose2d(3.57, 23.08, Math.toRadians(22.7)))
@@ -64,6 +63,16 @@ public class BasketSide extends OpMode {
 
         this.clawSlide.claw.closeAll();
         this.telemetry.addLine("Initialized");
+        this.telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+        this.driver.getLocalizer().update();
+        this.telemetry.addLine("Initialized");
+        Pose2d pos = this.driver.getPoseEstimate();
+        this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
+        this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
         this.telemetry.update();
     }
 
@@ -93,28 +102,28 @@ public class BasketSide extends OpMode {
         builder
             .addTemporalMarker(clawSlide.claw::openAll)
             .addTemporalMarker(clawSlide::putDown)
-            .waitSeconds(2.5)
+            .waitSeconds(2)
             .addTemporalMarker(clawSlide.claw::closeAll)
             .waitSeconds(0.3)
             .addTemporalMarker(clawSlide::retractAndPullUp)
-            .waitSeconds(2.5);
+            .waitSeconds(2);
         this.addPutSequence(builder);
     }
 
     private void addPutSequence(TrajectorySequenceBuilder builder) {
         // after pick
         builder
-            .lineToLinearHeading(new Pose2d(8.76107389605646, 19.416063003340632, Math.toRadians(133.9666662812233)))
+            .lineToLinearHeading(new Pose2d(5.83, 16.17, Math.toRadians(130)))
             .addTemporalMarker(() -> this.clawSlide.claw.setRotate(110))
             .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION))
             .waitSeconds(1.0)
-            .lineToLinearHeading(new Pose2d(3.4426199746376125, 25.05780188982583, Math.toRadians(134.2680273652077)))
-            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(136))
-            .waitSeconds(0.3)
+            .lineToLinearHeading(new Pose2d(3.27, 24.9, Math.toRadians(130)))
+            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(130))
+            .waitSeconds(0.1)
             .addTemporalMarker(this.clawSlide.claw::openAll)
             .waitSeconds(0.3)
             .addTemporalMarker(() -> this.clawSlide.claw.setRotate(110))
-            .lineToLinearHeading(new Pose2d(6.854692220441095, 21.56748698488529, Math.toRadians(133.6817999482154)))
+            .lineToLinearHeading(new Pose2d(6.68, 20.73, Math.toRadians(130)))
             .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(0))
             .waitSeconds(0.5);
     }
