@@ -3,20 +3,20 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.action.ActionSequence;
 import org.firstinspires.ftc.teamcode.action.ActionSet;
 import org.firstinspires.ftc.teamcode.action.ConditionedAction;
 import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
-import org.firstinspires.ftc.teamcode.teleop.AMainTeleOp;
 
 public class ClawSlide {
-    private static final double ROTATE_POWER = 0.3;
-    private static final double LIFT_POWER = 1.0;
+    private static final double ROTATE_POWER = 0.4;
+    private static final double LIFT_POWER = 0.8;
 
     public static final int ROTATE_MAX_POSITION = 1090;
-    private static final double ROTATE_ANGLE_RATIO = 90.0 / 980;
-    public static final int LIFT_MAX_POSITION = 2900;
+    private static final double ROTATE_ANGLE_RATIO = 90.0 / 990;
+    public static final int LIFT_MAX_POSITION = 2930;
     private static final int LIFT_MAX_POSITION_HORIZON = 2150;
 
     private static final double ROTATE_JOINT_HEIGHT = 9.7;
@@ -58,28 +58,14 @@ public class ClawSlide {
             clawArmRight);
 
         this.PUT_DOWN_ACTION = new ActionSequence(
-            new MotorPairAction(this.slideLift, 0),
-            new ConditionedAction(
-                () -> this.slideRotate.getLeftPosition() < 600,
-                new ActionSequence(
-                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
-                    new MotorPairAction(this.slideRotate, 600)
-                )
-            ),
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
-            new MotorPairAction(this.slideRotate, 940),
-            new TimedUpdateAction(0.3, () -> this.claw.setRotate(105)));
+            new MotorPairAction(this.slideLift, 0),
+            new MotorPairAction(this.slideRotate, 938),
+            new TimedUpdateAction(0.3, () -> this.claw.setRotate(113)));
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new ActionSequence(
-            new MotorPairAction(this.slideLift, 0),
-            new ConditionedAction(
-                () -> this.slideRotate.getLeftPosition() < 600,
-                new ActionSequence(
-                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
-                    new MotorPairAction(this.slideRotate, 600)
-                )
-            ),
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
+            new MotorPairAction(this.slideLift, 0),
             new MotorPairAction(this.slideRotate, 945),
             new MotorPairAction(this.slideLift, 1125),
             new TimedUpdateAction(0.3, () -> this.claw.setRotate(102)));
@@ -91,7 +77,7 @@ public class ClawSlide {
                 () -> this.slideRotate.getLeftPosition() > 600,
                 new ActionSequence(
                     new MotorPairAction(this.slideRotate, 600),
-                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(195))
+                    new TimedUpdateAction(0.1, () -> this.claw.setRotate(195))
                 )
             ),
             new MotorPairAction(this.slideRotate, 0)
@@ -99,6 +85,8 @@ public class ClawSlide {
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();
+        this.slideRotate.setGraduatedVelocity(60);
+        this.slideLift.setGraduatedVelocity(200);
     }
 
     public boolean inAction() {
@@ -141,6 +129,10 @@ public class ClawSlide {
         this.restricted = true;
     }
 
+    public boolean getRestricted() {
+        return this.restricted;
+    }
+
     public void update() {
         if (this.action != null) {
             this.action.update();
@@ -148,14 +140,14 @@ public class ClawSlide {
                 this.action = null;
             }
         }
-        AMainTeleOp.addLog("Position Restriction", this.restricted);
+        GlobalStorage.addData("Position Restriction", this.restricted);
         if (this.restricted) {
             double maxClawAngle = this.getMaxSafeClawAngle();
             double maxSlideAngle = this.getMaxSafeSlideAngle();
             double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
-            AMainTeleOp.addLog("D: Max Claw Rot:", maxClawAngle);
-            AMainTeleOp.addLog("D: Max Slide Rot:", maxSlideAngle);
-            AMainTeleOp.addLog("D: Max Slide Pos:", maxSlidePos);
+            GlobalStorage.addData("D: Max Claw Rot:", maxClawAngle);
+            GlobalStorage.addData("D: Max Slide Rot:", maxSlideAngle);
+            GlobalStorage.addData("D: Max Slide Pos:", maxSlidePos);
             // this.claw.setMaxRot(maxClawAngle - CLAW_ROT_OFFSET);
             // this.slideRotate.setMaxPosition((int)(maxSlideAngle / ROTATE_ANGLE_RATIO));
             // this.slideLift.setMaxPosition((int)(maxSlidePos / LIFT_POSITION_LENGTH_RATIO));

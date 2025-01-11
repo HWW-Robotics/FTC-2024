@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 @Autonomous(group = "drive")
 public class FollowerPIDTuner extends LinearOpMode {
-    public static double DISTANCE = 48; // in
+    public static double DISTANCE = 20; // in
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -38,18 +38,56 @@ public class FollowerPIDTuner extends LinearOpMode {
 
         if (isStopRequested()) return;
 
+        TrajectorySequence squareSeq = drive.trajectorySequenceBuilder(startPose)
+            .forward(DISTANCE)
+            .turn(Math.toRadians(90))
+            .forward(DISTANCE)
+            .turn(Math.toRadians(90))
+            .forward(DISTANCE)
+            .turn(Math.toRadians(90))
+            .forward(DISTANCE)
+            .turn(Math.toRadians(90))
+            .build();
+
+        TrajectorySequence moveSeq = drive.trajectorySequenceBuilder(startPose)
+            .forward(DISTANCE)
+            .waitSeconds(1)
+            .back(DISTANCE)
+            .waitSeconds(1)
+            .build();
+
+        TrajectorySequence turnSeq = drive.trajectorySequenceBuilder(startPose)
+            .turn(Math.toRadians(90))
+            .waitSeconds(1)
+            .turn(Math.toRadians(-90))
+            .waitSeconds(1)
+            .build();
+
+        int mode = 0;
+
         while (!isStopRequested()) {
-            TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                    .forward(DISTANCE)
-                    .turn(Math.toRadians(90))
-                    .forward(DISTANCE)
-                    .turn(Math.toRadians(90))
-                    .forward(DISTANCE)
-                    .turn(Math.toRadians(90))
-                    .forward(DISTANCE)
-                    .turn(Math.toRadians(90))
-                    .build();
-            drive.followTrajectorySequence(trajSeq);
+            if (gamepad1.x) {
+                mode = 0;
+            } else if (gamepad1.a) {
+                mode = 1;
+            } else if (gamepad1.b) {
+                mode = 2;
+            } else if (gamepad1.y) {
+                mode = 3;
+            }
+            telemetry.addData("mode", mode);
+            telemetry.update();
+            switch (mode) {
+                case 1:
+                    drive.followTrajectorySequence(moveSeq);
+                    break;
+                case 2:
+                    drive.followTrajectorySequence(turnSeq);
+                    break;
+                case 3:
+                    drive.followTrajectorySequence(squareSeq);
+                    break;
+            }
         }
     }
 }

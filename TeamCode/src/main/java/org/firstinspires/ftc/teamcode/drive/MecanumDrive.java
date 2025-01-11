@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class MecanumDrive {
-    private static final double POWER_RATIO = DriveConstants.inchesToEncoderTicks(120);
+    private static final double POWER_RATIO = DriveConstants.inchesToEncoderTicks(80);
     private final DcMotor rightFront, rightRear, leftFront, leftRear;
     private double maxPower;
     private double rightFrontPower, rightRearPower, leftFrontPower, leftRearPower, powerBase;
@@ -85,11 +85,11 @@ public class MecanumDrive {
      * @param y forward-back shift
      */
     public void shift(double x, double y) {
-        double power = Math.sqrt(x * x + y * y);
+        double power = x * x + y * y;
         if (power == 0) {
             return;
         }
-        double yaw = Math.atan2(y, x) - Math.PI / 4;
+        double yaw = Math.atan2(-y, -x) - Math.PI / 4;
         double xPower = Math.sin(yaw) * power;
         double yPower = Math.cos(yaw) * power;
         this.addPowers(yPower, xPower, xPower, yPower);

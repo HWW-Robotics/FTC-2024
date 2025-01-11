@@ -32,7 +32,7 @@ public class Claw {
     }
 
     public void setMaxRot(double rot) {
-        this.maxRot = Math.min(Math.max(rot, MIN_ROT), MAX_CLAW);
+        this.maxRot = Math.min(Math.max(rot, MIN_ROT), MAX_ROT);
     }
 
     public double getLeftRotAngle() {
