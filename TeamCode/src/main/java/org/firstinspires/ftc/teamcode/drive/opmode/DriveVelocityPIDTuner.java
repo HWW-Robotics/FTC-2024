@@ -51,11 +51,12 @@ import java.util.List;
 @Config
 @Autonomous(group = "drive")
 public class DriveVelocityPIDTuner extends LinearOpMode {
-    public static double DISTANCE = 60; // in
+    public static double DISTANCE = 50; // in
 
     enum Mode {
         DRIVER_MODE,
-        TUNING_MODE
+        TUNING_MODE,
+        POSITION_MODE
     }
 
     private static MotionProfile generateProfile(boolean movingForward) {
@@ -75,7 +76,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Mode mode = Mode.TUNING_MODE;
+        Mode mode = Mode.DRIVER_MODE;
 
         double lastKp = MOTOR_VELO_PID.p;
         double lastKi = MOTOR_VELO_PID.i;
@@ -102,13 +103,32 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
         while (!isStopRequested()) {
             telemetry.addData("mode", mode);
 
+            if (gamepad1.b) {
+                if (mode != Mode.TUNING_MODE) {
+                    mode = Mode.TUNING_MODE;
+                    drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    movingForwards = true;
+                    activeProfile = generateProfile(movingForwards);
+                    profileStart = clock.seconds();
+                }
+            } else if (gamepad1.y) {
+                if (mode != Mode.DRIVER_MODE) {
+                    mode = Mode.DRIVER_MODE;
+                    drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+            }
             switch (mode) {
+                case DRIVER_MODE:
+                    drive.setWeightedDrivePower(
+                        new Pose2d(
+                            -gamepad1.left_stick_y,
+                            -gamepad1.left_stick_x,
+                            -gamepad1.right_stick_x
+                        )
+                    );
+                    break;
                 case TUNING_MODE:
-                    if (gamepad1.y) {
-                        mode = Mode.DRIVER_MODE;
-                        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    }
-
+                case POSITION_MODE:
                     // calculate and set the motor power
                     double profileTime = clock.seconds() - profileStart;
 
@@ -130,28 +150,10 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
                     for (int i = 0; i < velocities.size(); i++) {
                         telemetry.addData("measuredVelocity" + i, velocities.get(i));
                         telemetry.addData(
-                                "error" + i,
-                                motionState.getV() - velocities.get(i)
+                            "error" + i,
+                            motionState.getV() - velocities.get(i)
                         );
                     }
-                    break;
-                case DRIVER_MODE:
-                    if (gamepad1.b) {
-                        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-                        mode = Mode.TUNING_MODE;
-                        movingForwards = true;
-                        activeProfile = generateProfile(movingForwards);
-                        profileStart = clock.seconds();
-                    }
-
-                    drive.setWeightedDrivePower(
-                            new Pose2d(
-                                    -gamepad1.left_stick_y,
-                                    -gamepad1.left_stick_x,
-                                    -gamepad1.right_stick_x
-                            )
-                    );
                     break;
             }
 

@@ -11,11 +11,11 @@ import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
 
 public class ClawSlide {
-    private static final double ROTATE_POWER = 0.3;
-    private static final double LIFT_POWER = 1.0;
+    private static final double ROTATE_POWER = 0.4;
+    private static final double LIFT_POWER = 0.8;
 
     public static final int ROTATE_MAX_POSITION = 1090;
-    private static final double ROTATE_ANGLE_RATIO = 90.0 / 980;
+    private static final double ROTATE_ANGLE_RATIO = 90.0 / 990;
     public static final int LIFT_MAX_POSITION = 2930;
     private static final int LIFT_MAX_POSITION_HORIZON = 2150;
 
@@ -77,7 +77,7 @@ public class ClawSlide {
                 () -> this.slideRotate.getLeftPosition() > 600,
                 new ActionSequence(
                     new MotorPairAction(this.slideRotate, 600),
-                    new TimedUpdateAction(0.2, () -> this.claw.setRotate(195))
+                    new TimedUpdateAction(0.1, () -> this.claw.setRotate(195))
                 )
             ),
             new MotorPairAction(this.slideRotate, 0)
@@ -85,6 +85,8 @@ public class ClawSlide {
 
         this.slideRotate.resetPosition();
         this.slideLift.resetPosition();
+        this.slideRotate.setGraduatedVelocity(60);
+        this.slideLift.setGraduatedVelocity(200);
     }
 
     public boolean inAction() {
@@ -125,6 +127,10 @@ public class ClawSlide {
 
     public void setRestrictions() {
         this.restricted = true;
+    }
+
+    public boolean getRestricted() {
+        return this.restricted;
     }
 
     public void update() {

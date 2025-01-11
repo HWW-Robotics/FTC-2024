@@ -85,7 +85,7 @@ public class MecanumDrive {
      * @param y forward-back shift
      */
     public void shift(double x, double y) {
-        double power = Math.sqrt(x * x + y * y);
+        double power = x * x + y * y;
         if (power == 0) {
             return;
         }

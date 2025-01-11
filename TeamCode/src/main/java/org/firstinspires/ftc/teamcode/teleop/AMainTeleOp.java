@@ -49,6 +49,17 @@ public class AMainTeleOp extends OpMode {
     }
 
     @Override
+    public void init_loop() {
+        final long startTime = System.nanoTime();
+        final double loopInterval = (double)(startTime - lastLoopStart) / 1e9;
+
+        final long endTime = System.nanoTime();
+        lastLoopStart = startTime;
+        this.telemetry.addData("MSPT", "%.06f", (double)(endTime - startTime) / 1e6);
+        this.telemetry.addData("TPS", "%.01f", 1 / loopInterval);
+    }
+
+    @Override
     public void loop() {
         final long startTime = System.nanoTime();
         final double loopInterval = (double)(startTime - lastLoopStart) / 1e9;
@@ -107,6 +118,11 @@ public class AMainTeleOp extends OpMode {
                 this.clawSlide.slideLift.move((int) (-this.gamepad2.left_stick_y * 120));
                 clawActioned = true;
             }
+            if (this.gamepad2.left_trigger >= 0.7) {
+                if (this.clawSlide.getRestricted()) {
+                    this.clawSlide.slideLift.setPosition(990);
+                }
+            }
         }
 
         /// Claws
@@ -155,6 +171,7 @@ public class AMainTeleOp extends OpMode {
         this.telemetry.addData("SlideRot", this.clawSlide.slideRotate.getLeftPosition());
         this.telemetry.addData("SlideMaxPos", this.clawSlide.slideLift.getMaxPosition());
         this.telemetry.addData("SlideLift", this.clawSlide.slideLift.getLeftPosition());
+        this.telemetry.addData("SlideLift Diff", this.clawSlide.slideLift.getRightPosition() - this.clawSlide.slideLift.getLeftPosition());
         this.telemetry.addData("ClawRot", this.clawSlide.claw.getLeftRotAngle());
 
         this.prevGamepad1.copy(this.gamepad1);
@@ -162,7 +179,7 @@ public class AMainTeleOp extends OpMode {
 
         final long endTime = System.nanoTime();
         lastLoopStart = startTime;
-        this.telemetry.addData("LOOP DURATION", "%.02fµs", (double)(endTime - startTime) / 1000);
-        this.telemetry.addData("LOOP TPS", "%.01f", 1 / loopInterval);
+        this.telemetry.addData("MSPT", "%.06f", (double)(endTime - startTime) / 1e6);
+        this.telemetry.addData("TPS", "%.01f", 1 / loopInterval);
     }
 }
