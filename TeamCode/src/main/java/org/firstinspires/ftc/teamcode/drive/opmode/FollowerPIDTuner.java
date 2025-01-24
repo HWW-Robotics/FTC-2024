@@ -30,7 +30,7 @@ public class FollowerPIDTuner extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Pose2d startPose = new Pose2d(-DISTANCE / 2, -DISTANCE / 2, 0);
+        Pose2d startPose = new Pose2d(-DISTANCE / 2, -DISTANCE / 2, Math.toRadians(90));
 
         drive.setPoseEstimate(startPose);
 
@@ -57,9 +57,9 @@ public class FollowerPIDTuner extends LinearOpMode {
             .build();
 
         TrajectorySequence turnSeq = drive.trajectorySequenceBuilder(startPose)
-            .turn(Math.toRadians(90))
+            .turn(Math.toRadians(180))
             .waitSeconds(1)
-            .turn(Math.toRadians(-90))
+            .turn(Math.toRadians(-180))
             .waitSeconds(1)
             .build();
 

@@ -24,6 +24,7 @@ public class BasketSide extends OpMode {
     @Override
     public void init() {
         GlobalStorage.onInit(this);
+        GlobalStorage.destroyDriver();
         this.driver = GlobalStorage.getOrCreateDriver(hardwareMap);
         this.driver.setPoseEstimate(new Pose2d(0, 0, 0));
         this.clawSlide = new ClawSlide(
@@ -42,7 +43,7 @@ public class BasketSide extends OpMode {
 
         TrajectorySequenceBuilder builder = driver.trajectorySequenceBuilder(new Pose2d(0, 0, 0));
         builder
-            .lineToLinearHeading(new Pose2d(6,13, Math.toRadians(0)));
+            .lineToLinearHeading(new Pose2d(15,0, Math.toRadians(100)));
         this.addPutSequence(builder);
 
         builder
@@ -51,7 +52,7 @@ public class BasketSide extends OpMode {
 
         builder
             .lineToLinearHeading(new Pose2d(14, 25.66, Math.toRadians(0)));
-        this.addPickAndPutSequence(builder);
+        // this.addPickAndPutSequence(builder);
 
         // builder
         //     .lineToLinearHeading(new Pose2d(3.57, 23.08, Math.toRadians(22.7)))
@@ -91,12 +92,14 @@ public class BasketSide extends OpMode {
 
         this.telemetry.addData("isBusy", this.driver.isBusy());
         this.telemetry.addData("inAction", this.clawSlide.inAction());
+        //
+        // Pose2d pos = this.driver.getPoseEstimate();
+        // this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
+        // this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
 
-        Pose2d pos = this.driver.getPoseEstimate();
-        this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
-        this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
-
-        this.telemetry.addData("Lift Diff", this.clawSlide.slideLift.left.getCurrentPosition() - this.clawSlide.slideLift.right.getCurrentPosition());
+        double rightLiftPos = this.clawSlide.slideLift.right.getCurrentPosition();
+        this.telemetry.addData("Lift Right", rightLiftPos);
+        this.telemetry.addData("Lift Diff", this.clawSlide.slideLift.left.getCurrentPosition() - rightLiftPos);
         this.telemetry.update();
     }
 
@@ -109,7 +112,8 @@ public class BasketSide extends OpMode {
             .addTemporalMarker(clawSlide.claw::closeAll)
             .waitSeconds(0.3)
             .addTemporalMarker(clawSlide::retractAndPullUp)
-            .waitSeconds(1.8);
+            .waitSeconds(1.4)
+            .lineToLinearHeading(new Pose2d(4, 24.9, Math.toRadians(120)));
         this.addPutSequence(builder);
     }
 

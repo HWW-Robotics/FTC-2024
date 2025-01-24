@@ -161,7 +161,7 @@ public class AMainTeleOp extends OpMode {
         /// Drives
         this.driver.updatePoseEstimate();
         this.drive.shift(this.gamepad1.left_stick_x, this.gamepad1.left_stick_y);
-        this.drive.rotate(this.gamepad1.right_stick_x);
+        this.drive.rotate(Math.signum(this.gamepad1.right_stick_x) * this.gamepad1.right_stick_x * this.gamepad1.right_stick_x);
         this.drive.updatePowers();
 
         Pose2d pos = this.driver.getPoseEstimate();

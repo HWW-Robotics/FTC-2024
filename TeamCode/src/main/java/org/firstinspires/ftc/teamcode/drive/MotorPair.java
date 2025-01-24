@@ -4,21 +4,23 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class MotorPair {
     public final DcMotor left, right;
-    private int maxPosition;
+    private int minPosition, maxPosition;
     private double power;
-    private int currentTargetPos = 0;
+    private int currentTargetPos;
     private int graduatedVelocity = 0;
 
-    public MotorPair(int maxPosition, double power, DcMotor left, DcMotor right) {
-        this(maxPosition, power, left, right, DcMotor.Direction.FORWARD, DcMotor.Direction.REVERSE);
+    public MotorPair(int minPosition, int maxPosition, double power, DcMotor left, DcMotor right) {
+        this(minPosition, maxPosition, power, left, right, DcMotor.Direction.FORWARD, DcMotor.Direction.REVERSE);
     }
 
-    public MotorPair(int maxPosition, double power, DcMotor left, DcMotor right, DcMotor.Direction direction) {
-        this(maxPosition, power, left, right, direction, direction);
+    public MotorPair(int minPosition, int maxPosition, double power, DcMotor left, DcMotor right, DcMotor.Direction direction) {
+        this(minPosition, maxPosition, power, left, right, direction, direction);
     }
 
-    public MotorPair(int maxPosition, double power, DcMotor left, DcMotor right, DcMotor.Direction leftDirection, DcMotor.Direction rightDirection) {
+    public MotorPair(int minPosition, int maxPosition, double power, DcMotor left, DcMotor right, DcMotor.Direction leftDirection, DcMotor.Direction rightDirection) {
+        this.minPosition = minPosition;
         this.maxPosition = maxPosition;
+        this.currentTargetPos = this.minPosition;
         this.power = power;
         this.left = left;
         this.right = right;
@@ -44,6 +46,10 @@ public class MotorPair {
         this.right.setPower(this.power);
     }
 
+    public int getMinPosition() {
+        return this.minPosition;
+    }
+
     public int getMaxPosition() {
         return this.maxPosition;
     }
@@ -62,9 +68,7 @@ public class MotorPair {
     public void resetPosition() {
         this.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.left.setTargetPosition(0);
-        this.right.setTargetPosition(0);
-        this.setPosition(0);
+        this.setPosition(this.minPosition);
     }
 
     public int getTargetPosition() {
@@ -72,7 +76,7 @@ public class MotorPair {
     }
 
     public void setPosition(int pos) {
-        this.currentTargetPos = Math.min(Math.max(pos, 0), this.maxPosition);
+        this.currentTargetPos = Math.min(Math.max(pos, this.minPosition), this.maxPosition);
     }
 
     public void move(int pos) {
