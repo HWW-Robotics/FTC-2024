@@ -59,7 +59,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected boolean shouldOperateLeftClaw() {
-        return !this.prevGamepad2.left_bumper && this.gamepad2.left_bumper;
+        return !this.prevGamepad1.left_bumper && this.gamepad1.left_bumper;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected boolean shouldOperateRightClaw() {
-        return !this.prevGamepad2.right_bumper && this.gamepad2.right_bumper;
+        return !this.prevGamepad1.right_bumper && this.gamepad1.right_bumper;
     }
 
     @Override
