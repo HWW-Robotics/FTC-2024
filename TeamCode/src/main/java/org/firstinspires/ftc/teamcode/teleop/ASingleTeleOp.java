@@ -4,9 +4,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.drive.ClawSlide;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @TeleOp(name = "ASingleTeleOp")
 public class ASingleTeleOp extends AbstractTeleOp {
+    static final Pose2d BASKET_READY_POSE = new Pose2d(5.83, 16.17, Math.toRadians(130));
+
     @Override
     protected boolean shouldReleaseRestrictions() {
         return this.gamepad1.right_bumper;
@@ -106,14 +109,11 @@ public class ASingleTeleOp extends AbstractTeleOp {
     @Override
     protected void beforeDriveUpdate() {
         if (!this.prevGamepad1.left_stick_button && this.gamepad1.left_stick_button) {
-            // Turn to 130°
+            // Go in front of the basket and turn to 130°
             Pose2d pose = this.driver.getPoseEstimate();
-            double angle = Math.toRadians(130) - pose.getHeading();
-            double angle2 = angle + 2 * Math.PI;
-            if (Math.abs(angle2) > Math.abs(angle)) {
-                angle = angle2;
-            }
-            this.driver.followTrajectorySequenceAsync(this.driver.trajectorySequenceBuilder(pose).turn(angle).build());
+            this.driver.followTrajectorySequenceAsync(this.driver.trajectorySequenceBuilder(pose)
+                .lineToLinearHeading(BASKET_READY_POSE)
+                .build());
         } else if (!this.prevGamepad1.right_stick_button && this.gamepad1.right_stick_button) {
             // Turn to 270°
             Pose2d pose = this.driver.getPoseEstimate();
