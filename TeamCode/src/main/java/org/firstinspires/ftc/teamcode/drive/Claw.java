@@ -68,11 +68,11 @@ public class Claw {
     }
 
     public boolean isLeftClosed() {
-        return this.getLeftClawAngle() == MIN_CLAW;
+        return Math.abs(this.getLeftClawAngle() - MIN_CLAW) < 1;
     }
 
     public boolean isRightClosed() {
-        return this.getRightClawAngle() == MIN_CLAW;
+        return Math.abs(this.getRightClawAngle() - MIN_CLAW) < 1;
     }
 
     public void closeAll() {
