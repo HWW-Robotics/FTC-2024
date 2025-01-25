@@ -37,9 +37,9 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected int getSlideRotateTargetSpeed() {
-        if (this.gamepad1.dpad_left) {
+        if (this.gamepad1.dpad_up) {
             return -250;
-        } else if (this.gamepad1.dpad_right) {
+        } else if (this.gamepad1.dpad_down) {
             return 250;
         }
         return 0;
@@ -67,7 +67,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected boolean shouldOpenLeftClaw() {
-        return !this.clawSlide.claw.isLeftClosed();
+        return this.clawSlide.claw.isLeftClosed();
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected boolean shouldOpenRightClaw() {
-        return !this.clawSlide.claw.isRightClosed();
+        return this.clawSlide.claw.isRightClosed();
     }
 
     @Override
