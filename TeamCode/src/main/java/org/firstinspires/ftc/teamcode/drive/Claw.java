@@ -67,6 +67,14 @@ public class Claw {
         this.rightClaw.setPosition(angle / ROT_RATIO);
     }
 
+    public boolean isLeftClosed() {
+        return this.getLeftClawAngle() == MIN_CLAW;
+    }
+
+    public boolean isRightClosed() {
+        return this.getRightClawAngle() == MIN_CLAW;
+    }
+
     public void closeAll() {
         this.closeLeft();
         this.closeRight();

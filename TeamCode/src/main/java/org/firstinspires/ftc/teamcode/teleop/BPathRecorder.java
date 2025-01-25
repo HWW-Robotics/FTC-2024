@@ -6,7 +6,6 @@ import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.WebHandlerManager;
 import fi.iki.elonen.NanoHTTPD;
 
@@ -35,18 +34,17 @@ public class BPathRecorder extends AMainTeleOp {
     }
 
     @Override
-    public void loop() {
+    public void preLoop() {
+        super.preLoop();
         this.telemetry.addData("Nodes", nodes.size());
         this.telemetry.addLine();
+    }
 
-        super.loop();
+    @Override
+    public void postLoop() {
+        super.postLoop();
 
         Pose2d pos = this.driver.getPoseEstimate();
-
-        Gamepad prevGamepad1 = new Gamepad();
-        Gamepad prevGamepad2 = new Gamepad();
-        prevGamepad1.copy(this.prevGamepad1);
-        prevGamepad2.copy(this.prevGamepad2);
 
         recordRotorPos("slideRot", this.clawSlide.slideRotate.getTargetPosition());
         recordRotorPos("slideLift", this.clawSlide.slideLift.getTargetPosition());
@@ -55,7 +53,7 @@ public class BPathRecorder extends AMainTeleOp {
         recordRotorPos("clawArmRight", this.clawSlide.claw.getLeftClawAngle());
 
         RecordNode lastNode = nodes.get(nodes.size() - 1);
-        if (!prevGamepad1.a && this.gamepad1.a) {
+        if (!this.prevGamepad1.a && this.gamepad1.a) {
             nodes.add(new PoseNode(pos));
             nodes.add(new LogNode("ManualSave", true));
             nodes.add(new PoseNode(pos));
@@ -83,16 +81,16 @@ public class BPathRecorder extends AMainTeleOp {
                 }
             }
         }
-        if (!prevGamepad2.a && this.gamepad2.a) {
+        if (!this.prevGamepad2.a && this.gamepad2.a) {
             nodes.add(new ActionNode("A"));
         }
-        if (!prevGamepad2.b && this.gamepad2.b) {
+        if (!this.prevGamepad2.b && this.gamepad2.b) {
             nodes.add(new ActionNode("B"));
         }
-        if (!prevGamepad2.x && this.gamepad2.x) {
+        if (!this.prevGamepad2.x && this.gamepad2.x) {
             nodes.add(new ActionNode("X"));
         }
-        if (!prevGamepad2.y && this.gamepad2.y) {
+        if (!this.prevGamepad2.y && this.gamepad2.y) {
             nodes.add(new ActionNode("Y"));
         }
     }

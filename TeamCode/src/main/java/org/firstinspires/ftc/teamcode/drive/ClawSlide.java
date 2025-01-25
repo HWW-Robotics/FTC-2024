@@ -11,11 +11,13 @@ import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
 
 public class ClawSlide {
-    private static final double ROTATE_POWER = 0.4;
-    private static final double LIFT_POWER = 0.8;
+    private static final float ROTATE_POWER = 0.4f;
+    private static final float LIFT_POWER1 = 0.8f;
+    private static final float LIFT_POWER2 = 0.8f;
 
     public static final int ROTATE_MAX_POSITION = 1090;
     private static final double ROTATE_ANGLE_RATIO = 90.0 / 990;
+    public static final int LIFT_MIN_POSITION = 40;
     public static final int LIFT_MAX_POSITION = 2930;
     private static final int LIFT_MAX_POSITION_HORIZON = 2150;
 
@@ -41,16 +43,18 @@ public class ClawSlide {
         DcMotor leftRotation, DcMotor rightRotation, DcMotor leftSlide, DcMotor rightSlide,
         Servo clawRotLeft, Servo clawRotRight, Servo clawArmLeft, Servo clawArmRight) {
         this.slideRotate = new MotorPair(
-                ROTATE_MAX_POSITION,
-                ROTATE_POWER,
-                leftRotation,
-                rightRotation,
-                DcMotor.Direction.REVERSE);
+        0,
+            ROTATE_MAX_POSITION,
+            ROTATE_POWER,
+            leftRotation,
+            rightRotation,
+            DcMotor.Direction.REVERSE);
         this.slideLift = new MotorPair(
-                LIFT_MAX_POSITION,
-                LIFT_POWER,
-                leftSlide,
-                rightSlide);
+            LIFT_MIN_POSITION,
+            LIFT_MAX_POSITION,
+            LIFT_POWER1,
+            leftSlide,
+            rightSlide);
         this.claw = new Claw(
             clawRotLeft,
             clawRotRight,
@@ -59,25 +63,25 @@ public class ClawSlide {
 
         this.PUT_DOWN_ACTION = new ActionSequence(
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
-            new MotorPairAction(this.slideLift, 0),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
             new MotorPairAction(this.slideRotate, 938),
             new TimedUpdateAction(0.3, () -> this.claw.setRotate(113)));
 
         this.PUT_DOWN_AND_EXTEND_ACTION = new ActionSequence(
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
-            new MotorPairAction(this.slideLift, 0),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
             new MotorPairAction(this.slideRotate, 945),
             new MotorPairAction(this.slideLift, 1125),
             new TimedUpdateAction(0.3, () -> this.claw.setRotate(102)));
 
         this.RETRACT_AND_PULL_UP_ACTION = new ActionSequence(
             new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
-            new MotorPairAction(this.slideLift, 0),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
             new ConditionedAction(
                 () -> this.slideRotate.getLeftPosition() > 600,
                 new ActionSequence(
                     new MotorPairAction(this.slideRotate, 600),
-                    new TimedUpdateAction(0.1, () -> this.claw.setRotate(195))
+                    new TimedUpdateAction(0.08, () -> this.claw.setRotate(195))
                 )
             ),
             new MotorPairAction(this.slideRotate, 0)
@@ -123,10 +127,12 @@ public class ClawSlide {
 
     public void releaseRestrictions() {
         this.restricted = false;
+        this.slideLift.setPower(LIFT_POWER1);
     }
 
     public void setRestrictions() {
         this.restricted = true;
+        this.slideLift.setPower(LIFT_POWER2);
     }
 
     public boolean getRestricted() {

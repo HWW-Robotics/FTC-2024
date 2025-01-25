@@ -39,9 +39,9 @@ public class SlideTest extends OpMode {
 
     @Override
     public void loop() {
-        if (this.timer.seconds() > 3) {
+        if (this.timer.seconds() > 4) {
             this.timer.reset();
-            this.clawSlide.slideLift.setPosition(this.clawSlide.slideLift.getTargetPosition() == 0 ? ClawSlide.LIFT_MAX_POSITION : 0);
+            this.clawSlide.slideLift.setPosition(this.clawSlide.slideLift.getTargetPosition() == ClawSlide.LIFT_MAX_POSITION ? 0 : ClawSlide.LIFT_MAX_POSITION);
         }
         this.clawSlide.update();
 
