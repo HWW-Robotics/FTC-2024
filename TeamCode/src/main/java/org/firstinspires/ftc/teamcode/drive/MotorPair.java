@@ -5,19 +5,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class MotorPair {
     public final DcMotor left, right;
     private int minPosition, maxPosition;
-    private double power;
+    private float power;
     private int currentTargetPos;
     private int graduatedVelocity = 0;
 
-    public MotorPair(int minPosition, int maxPosition, double power, DcMotor left, DcMotor right) {
+    public MotorPair(int minPosition, int maxPosition, float power, DcMotor left, DcMotor right) {
         this(minPosition, maxPosition, power, left, right, DcMotor.Direction.FORWARD, DcMotor.Direction.REVERSE);
     }
 
-    public MotorPair(int minPosition, int maxPosition, double power, DcMotor left, DcMotor right, DcMotor.Direction direction) {
+    public MotorPair(int minPosition, int maxPosition, float power, DcMotor left, DcMotor right, DcMotor.Direction direction) {
         this(minPosition, maxPosition, power, left, right, direction, direction);
     }
 
-    public MotorPair(int minPosition, int maxPosition, double power, DcMotor left, DcMotor right, DcMotor.Direction leftDirection, DcMotor.Direction rightDirection) {
+    public MotorPair(int minPosition, int maxPosition, float power, DcMotor left, DcMotor right, DcMotor.Direction leftDirection, DcMotor.Direction rightDirection) {
         this.minPosition = minPosition;
         this.maxPosition = maxPosition;
         this.currentTargetPos = this.minPosition;
@@ -36,11 +36,11 @@ public class MotorPair {
         this.right.setPower(this.power);
     }
 
-    public double getPower() {
+    public float getPower() {
         return this.power;
     }
 
-    public void setPower(double power) {
+    public void setPower(float power) {
         this.power = Math.min(Math.max(power, 0), 1);
         this.left.setPower(this.power);
         this.right.setPower(this.power);

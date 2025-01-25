@@ -133,7 +133,7 @@ public class TrajectorySequenceRunner {
                 remainingMarkers.clear();
 
                 remainingMarkers.addAll(currentSegment.getMarkers());
-                Collections.sort(remainingMarkers, (t1, t2) -> Double.compare(t1.getTime(), t2.getTime()));
+                remainingMarkers.sort((t1, t2) -> Double.compare(t1.getTime(), t2.getTime()));
             }
 
             double deltaTime = now - currentSegmentStartTime;
@@ -189,9 +189,8 @@ public class TrajectorySequenceRunner {
                 }
             }
 
-            while (remainingMarkers.size() > 0 && deltaTime > remainingMarkers.get(0).getTime()) {
-                remainingMarkers.get(0).getCallback().onMarkerReached();
-                remainingMarkers.remove(0);
+            while (!remainingMarkers.isEmpty() && deltaTime > remainingMarkers.get(0).getTime()) {
+                remainingMarkers.remove(0).getCallback().onMarkerReached();
             }
         }
 

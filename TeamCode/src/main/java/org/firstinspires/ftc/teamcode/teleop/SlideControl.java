@@ -17,14 +17,14 @@ public class SlideControl extends OpMode {
         this.slideRotate = new MotorPair(
         0,
             1000,
-            0.5,
+            0.5f,
             hardwareMap.get(DcMotor.class, "leftRotation"),
             hardwareMap.get(DcMotor.class, "rightRotation"),
             DcMotor.Direction.REVERSE);
         this.slideLift = new MotorPair(
         0,
             2750,
-            1.0,
+            1.0f,
             hardwareMap.get(DcMotor.class, "leftSlide"),
             hardwareMap.get(DcMotor.class, "rightSlide"));
         this.slideRotate.resetPosition();
