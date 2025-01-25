@@ -38,9 +38,9 @@ public class ASingleTeleOp extends AbstractTeleOp {
     @Override
     protected int getSlideRotateTargetSpeed() {
         if (this.gamepad1.dpad_left) {
-            return -10;
+            return -250;
         } else if (this.gamepad1.dpad_right) {
-            return 10;
+            return 250;
         }
         return 0;
     }
@@ -53,9 +53,9 @@ public class ASingleTeleOp extends AbstractTeleOp {
     @Override
     protected int getSlideLiftTargetSpeed() {
         if (this.gamepad1.left_trigger >= 0.5) {
-            return -120;
+            return -2000;
         } else if (this.gamepad1.right_trigger >= 0.5) {
-            return 120;
+            return 2000;
         }
         return 0;
     }
@@ -81,7 +81,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
     }
 
     @Override
-    protected boolean beforeClawSlideUpdate() {
+    protected boolean beforeClawSlideUpdate(float dt) {
         if (this.inSlideAdjustMode()) {
             return false;
         }
@@ -97,10 +97,10 @@ public class ASingleTeleOp extends AbstractTeleOp {
             this.clawSlide.putDownAndExtend();
         }
         if (this.gamepad1.dpad_left) {
-            this.clawSlide.claw.rotate(-5);
+            this.clawSlide.claw.rotate(-80 * dt);
             updated = true;
         } else if (this.gamepad1.dpad_right) {
-            this.clawSlide.claw.rotate(5);
+            this.clawSlide.claw.rotate(80 * dt);
             updated = true;
         }
         return updated;

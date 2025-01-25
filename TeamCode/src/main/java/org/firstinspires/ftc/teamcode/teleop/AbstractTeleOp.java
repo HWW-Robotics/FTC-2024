@@ -108,7 +108,7 @@ public abstract class AbstractTeleOp extends OpMode {
             }
         }
 
-        if (this.beforeClawSlideUpdate()) {
+        if (this.beforeClawSlideUpdate(loopInterval)) {
             clawActioned = true;
         }
         if (clawActioned) {
@@ -124,15 +124,16 @@ public abstract class AbstractTeleOp extends OpMode {
         this.drive.shift(xPower, yPower);
         this.drive.rotate(Math.signum(rotatePower) * rotatePower * rotatePower);
         this.beforeDriveUpdate();
-        this.drive.updatePowers();
         if (this.driver.isBusy()) {
             if (moving) {
+                this.drive.updatePowers();
                 this.driver.followTrajectorySequenceAsync(null);
                 this.driver.updatePoseEstimate();
             } else {
                 this.driver.update();
             }
         } else {
+            this.drive.updatePowers();
             this.driver.updatePoseEstimate();
         }
 
@@ -196,7 +197,7 @@ public abstract class AbstractTeleOp extends OpMode {
     protected void preLoop() {}
     protected void postLoop() {}
 
-    protected boolean beforeClawSlideUpdate() {
+    protected boolean beforeClawSlideUpdate(float dt) {
         return false;
     }
 

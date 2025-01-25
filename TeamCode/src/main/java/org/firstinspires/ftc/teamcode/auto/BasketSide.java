@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuild
 @Autonomous(name = "BasketSide")
 public class BasketSide extends OpMode {
 
+    long lastLoopStart = 0;
     SampleMecanumDrive driver;
     ClawSlide clawSlide;
     TrajectorySequence sequence;
@@ -70,12 +71,20 @@ public class BasketSide extends OpMode {
 
     @Override
     public void init_loop() {
+        final long startTime = System.nanoTime();
+        final float loopInterval = (float)(startTime - lastLoopStart) / 1e9f;
+
         this.driver.getLocalizer().update();
         this.telemetry.addLine("Initialized");
         Pose2d pos = this.driver.getPoseEstimate();
         this.telemetry.addData("Pos", "%+03.02f, %+03.02f", pos.getX(), pos.getY());
         this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
-        this.telemetry.update();
+
+        this.telemetry.addLine();
+        final long endTime = System.nanoTime();
+        lastLoopStart = startTime;
+        this.telemetry.addData("MSPT", "%.06f", (float)(endTime - startTime) / 1e6f);
+        this.telemetry.addData("TPS", "%.01f", 1f / loopInterval);
     }
 
     @Override
@@ -87,6 +96,9 @@ public class BasketSide extends OpMode {
 
     @Override
     public void loop() {
+        final long startTime = System.nanoTime();
+        final float loopInterval = (float)(startTime - lastLoopStart) / 1e9f;
+
         this.driver.update();
         this.clawSlide.update();
 
@@ -100,7 +112,12 @@ public class BasketSide extends OpMode {
         double rightLiftPos = this.clawSlide.slideLift.right.getCurrentPosition();
         this.telemetry.addData("Lift Right", rightLiftPos);
         this.telemetry.addData("Lift Diff", this.clawSlide.slideLift.left.getCurrentPosition() - rightLiftPos);
-        this.telemetry.update();
+
+        this.telemetry.addLine();
+        final long endTime = System.nanoTime();
+        lastLoopStart = startTime;
+        this.telemetry.addData("MSPT", "%.06f", (float)(endTime - startTime) / 1e6f);
+        this.telemetry.addData("TPS", "%.01f", 1f / loopInterval);
     }
 
     private void addPickAndPutSequence(TrajectorySequenceBuilder builder) {
