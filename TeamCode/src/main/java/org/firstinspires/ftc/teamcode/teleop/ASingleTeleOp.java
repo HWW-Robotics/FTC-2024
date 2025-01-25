@@ -119,7 +119,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
             Pose2d pose = this.driver.getPoseEstimate();
             double angle = Math.toRadians(270) - pose.getHeading();
             double angle2 = angle - 2 * Math.PI;
-            if (Math.abs(angle2) > Math.abs(angle)) {
+            if (Math.abs(angle2) < Math.abs(angle)) {
                 angle = angle2;
             }
             this.driver.followTrajectorySequenceAsync(this.driver.trajectorySequenceBuilder(pose).turn(angle).build());
