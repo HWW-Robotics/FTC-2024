@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @TeleOp(name = "ASingleTeleOp")
 public class ASingleTeleOp extends AbstractTeleOp {
-    static final Pose2d BASKET_READY_POSE = new Pose2d(5.83, 16.17, Math.toRadians(130));
+    static final Pose2d BASKET_READY_POSE = new Pose2d(5.5, 23.25, Math.toRadians(135));
 
     @Override
     protected boolean shouldReleaseRestrictions() {
@@ -97,10 +97,10 @@ public class ASingleTeleOp extends AbstractTeleOp {
             this.clawSlide.putDownAndExtend();
         }
         if (this.gamepad1.dpad_left) {
-            this.clawSlide.claw.rotate(-80 * dt);
+            this.clawSlide.claw.rotate(-50 * dt);
             updated = true;
         } else if (this.gamepad1.dpad_right) {
-            this.clawSlide.claw.rotate(80 * dt);
+            this.clawSlide.claw.rotate(50 * dt);
             updated = true;
         }
         return updated;
@@ -109,11 +109,12 @@ public class ASingleTeleOp extends AbstractTeleOp {
     @Override
     protected void beforeDriveUpdate() {
         if (!this.prevGamepad1.left_stick_button && this.gamepad1.left_stick_button) {
-            // Go in front of the basket and turn to 130°
+            // Go in front of the basket and turn to 135°
             Pose2d pose = this.driver.getPoseEstimate();
             this.driver.followTrajectorySequenceAsync(this.driver.trajectorySequenceBuilder(pose)
                 .lineToLinearHeading(BASKET_READY_POSE)
                 .build());
+            this.clawSlide.claw.setRotate(8);
         } else if (!this.prevGamepad1.right_stick_button && this.gamepad1.right_stick_button) {
             // Turn to 270°
             Pose2d pose = this.driver.getPoseEstimate();

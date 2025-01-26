@@ -44,7 +44,7 @@ public class BasketSide extends OpMode {
 
         TrajectorySequenceBuilder builder = driver.trajectorySequenceBuilder(new Pose2d(0, 0, 0));
         builder
-            .lineToLinearHeading(new Pose2d(15,0, Math.toRadians(100)));
+            .lineToLinearHeading(new Pose2d(5.5, 23.25, Math.toRadians(135)));
         this.addPutSequence(builder);
 
         builder
