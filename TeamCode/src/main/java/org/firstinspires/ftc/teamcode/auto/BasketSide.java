@@ -43,8 +43,6 @@ public class BasketSide extends OpMode {
         this.telemetry.update();
 
         TrajectorySequenceBuilder builder = driver.trajectorySequenceBuilder(new Pose2d(0, 0, 0));
-        builder
-            .lineToLinearHeading(new Pose2d(5.5, 23.25, Math.toRadians(135)));
         this.addPutSequence(builder);
 
         builder
@@ -137,7 +135,7 @@ public class BasketSide extends OpMode {
     private void addPutSequence(TrajectorySequenceBuilder builder) {
         // after pick
         builder
-            // .lineToLinearHeading(new Pose2d(5.83, 16.17, Math.toRadians(130)))
+            .lineToLinearHeading(new Pose2d(5.5, 23.25, Math.toRadians(135)))
             .addTemporalMarker(() -> this.clawSlide.claw.setRotate(30))
             .lineToLinearHeading(new Pose2d(3.27, 24.9, Math.toRadians(130)))
             .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION))
