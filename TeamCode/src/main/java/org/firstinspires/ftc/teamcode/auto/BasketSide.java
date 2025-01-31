@@ -127,8 +127,7 @@ public class BasketSide extends OpMode {
             .addTemporalMarker(clawSlide.claw::closeAll)
             .waitSeconds(0.3)
             .addTemporalMarker(clawSlide::retractAndPullUp)
-            .waitSeconds(1.4)
-            .lineToLinearHeading(new Pose2d(4, 24.9, Math.toRadians(120)));
+            .waitSeconds(1.4);
         this.addPutSequence(builder);
     }
 

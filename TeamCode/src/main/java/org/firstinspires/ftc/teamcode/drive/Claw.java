@@ -5,9 +5,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Claw {
     private static final double ROT_RATIO = 250.0;
     public static final double MIN_ROT = 2;
-    public static final double MAX_ROT = 195;
+    public static final double MAX_ROT = 175;
     public static final double MIN_CLAW = 8;
     public static final double MAX_CLAW = 46;
+    public static final double LEFT_CLOSE_ANGLE = MIN_CLAW;
+    public static final double LEFT_OPEN_ANGLE = MAX_CLAW;
+    public static final double RIGHT_CLOSE_ANGLE = MAX_CLAW;
+    public static final double RIGHT_OPEN_ANGLE = MIN_CLAW;
     private double maxRot = MAX_ROT;
     private final Servo leftRot, rightRot;
     private final Servo leftClaw, rightClaw;
@@ -68,11 +72,11 @@ public class Claw {
     }
 
     public boolean isLeftClosed() {
-        return Math.abs(this.getLeftClawAngle() - MIN_CLAW) < 1;
+        return Math.abs(this.getLeftClawAngle() - LEFT_CLOSE_ANGLE) < 1;
     }
 
     public boolean isRightClosed() {
-        return Math.abs(this.getRightClawAngle() - MIN_CLAW) < 1;
+        return Math.abs(this.getRightClawAngle() - RIGHT_CLOSE_ANGLE) < 1;
     }
 
     public void closeAll() {
@@ -81,11 +85,11 @@ public class Claw {
     }
 
     public void closeLeft() {
-        this.setLeftClawAngle(MIN_CLAW);;
+        this.setLeftClawAngle(LEFT_CLOSE_ANGLE);;
     }
 
     public void closeRight() {
-        this.setRightClawAngle(MIN_CLAW);
+        this.setRightClawAngle(RIGHT_CLOSE_ANGLE);
     }
 
     public void openAll() {
@@ -94,11 +98,11 @@ public class Claw {
     }
 
     public void openLeft() {
-        this.setLeftClawAngle(MAX_CLAW);;
+        this.setLeftClawAngle(LEFT_OPEN_ANGLE);;
     }
 
     public void openRight() {
-        this.setRightClawAngle(MAX_CLAW);;
+        this.setRightClawAngle(RIGHT_OPEN_ANGLE);;
     }
 
     public void setRotate(double angle) {

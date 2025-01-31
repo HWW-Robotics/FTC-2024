@@ -89,12 +89,12 @@ public class ASingleTeleOp extends AbstractTeleOp {
         if (this.gamepad1.b) {
             this.clawSlide.claw.setRotate(110);
             updated = true;
-        } else if (this.gamepad1.y) {
+        } else if (!this.prevGamepad1.y && this.gamepad1.y) {
             this.clawSlide.retractAndPullUp();
-        } else if (this.gamepad1.x) {
+        } else if (!this.prevGamepad1.x && this.gamepad1.x) {
             this.clawSlide.putDown();
-        } else if (this.gamepad1.a) {
-            this.clawSlide.putDownAndExtend();
+        } else if (!this.prevGamepad1.a && this.gamepad1.a) {
+            this.clawSlide.putDownAndExtendNoPick();
         }
         if (this.gamepad1.dpad_left) {
             this.clawSlide.claw.rotate(-50 * dt);

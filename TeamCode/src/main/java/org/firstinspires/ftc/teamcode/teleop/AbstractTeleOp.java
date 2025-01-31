@@ -7,41 +7,50 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Configurations;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
+import org.firstinspires.ftc.teamcode.cache.CachedHardware;
 import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractTeleOp extends OpMode {
     static final double MAX_DRIVE_POWER = 0.5;
     public Gamepad prevGamepad1 = new Gamepad();
     public Gamepad prevGamepad2 = new Gamepad();
+
     long lastLoopStart = 0;
+    List<CachedHardware> cachedHardwares = new ArrayList<>();
     SampleMecanumDrive driver;
     MecanumDrive drive;
     ClawSlide clawSlide;
+    boolean wasAdjusting = false;
 
     @Override
     public void init() {
         GlobalStorage.onInit(this);
         this.driver = GlobalStorage.getOrCreateDriver(hardwareMap);
+        this.driver.followTrajectorySequenceAsync(null);
         this.drive = new MecanumDrive(
             MAX_DRIVE_POWER,
-            hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_FRONT_WHEEL),
-            hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_REAR_WHEEL),
-            hardwareMap.get(DcMotorEx.class, Configurations.LEFT_FRONT_WHEEL),
-            hardwareMap.get(DcMotorEx.class, Configurations.LEFT_REAR_WHEEL)
+            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_FRONT_WHEEL), cachedHardwares),
+            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_REAR_WHEEL), cachedHardwares),
+            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.LEFT_FRONT_WHEEL), cachedHardwares),
+            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.LEFT_REAR_WHEEL), cachedHardwares)
         );
         this.clawSlide = new ClawSlide(
-            hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_ROT),
-            hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_ROT),
-            hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_LIFT),
-            hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_LIFT),
-            hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ROT),
-            hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ROT),
-            hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ARM),
-            hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ARM)
+            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_ROT), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_ROT), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_LIFT), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_LIFT), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ROT), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ROT), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ARM), cachedHardwares),
+            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ARM), cachedHardwares)
         );
         this.clawSlide.claw.closeAll();
     }
@@ -50,6 +59,10 @@ public abstract class AbstractTeleOp extends OpMode {
     public void init_loop() {
         final long startTime = System.nanoTime();
         final float loopInterval = (float)(startTime - lastLoopStart) / 1e9f;
+
+        for (CachedHardware c : cachedHardwares) {
+            c.updateInfos();
+        }
 
         final long endTime = System.nanoTime();
         lastLoopStart = startTime;
@@ -62,6 +75,10 @@ public abstract class AbstractTeleOp extends OpMode {
         final long startTime = System.nanoTime();
         final float loopInterval = (float)(startTime - lastLoopStart) / 1e9f;
 
+        for (CachedHardware c : cachedHardwares) {
+            c.updateInfos();
+        }
+
         this.preLoop();
 
         boolean clawActioned = false;
@@ -73,10 +90,15 @@ public abstract class AbstractTeleOp extends OpMode {
         }
 
         /// Slides
-        if (this.inSlideAdjustMode()) {
+        boolean adjustingSlide = this.inSlideAdjustMode();
+        if (adjustingSlide) {
             clawActioned = true;
             this.onAdjustSlide();
+            this.wasAdjusting = true;
         } else {
+            if (this.wasAdjusting) {
+                this.onStopAdjustSlide();
+            }
             int rotateSpeed = this.getSlideRotateTargetSpeed();
             if (rotateSpeed != 0) {
                 this.clawSlide.slideRotate.move((int)(rotateSpeed * loopInterval));
@@ -111,10 +133,12 @@ public abstract class AbstractTeleOp extends OpMode {
         if (this.beforeClawSlideUpdate(loopInterval)) {
             clawActioned = true;
         }
+        this.telemetry.addData("clawActioned", clawActioned);
+        this.telemetry.addData("clawInAction", this.clawSlide.inAction());
         if (clawActioned) {
             this.clawSlide.cancelAction();
         }
-        if (!this.inSlideAdjustMode()) {
+        if (!adjustingSlide) {
             this.clawSlide.update();
         }
 
@@ -142,7 +166,7 @@ public abstract class AbstractTeleOp extends OpMode {
         this.telemetry.addData("Heading", Math.toDegrees(pos.getHeading()));
         this.telemetry.addLine();
         this.telemetry.addData("SlideRot", this.clawSlide.slideRotate.getLeftPosition());
-        this.telemetry.addData("SlideMaxPos", this.clawSlide.slideLift.getMaxPosition());
+        this.telemetry.addData("SlideRotTarget", this.clawSlide.slideRotate.getTargetPosition());
         this.telemetry.addData("SlideLift", this.clawSlide.slideLift.getLeftPosition());
         this.telemetry.addData("SlideLift Diff", this.clawSlide.slideLift.getRightPosition() - this.clawSlide.slideLift.getLeftPosition());
         this.telemetry.addData("ClawRot", this.clawSlide.claw.getLeftRotAngle());
@@ -170,27 +194,34 @@ public abstract class AbstractTeleOp extends OpMode {
         } else if (this.gamepad2.dpad_down) {
             this.adjustSlideRotateDown();
         } else {
-            final float power = this.gamepad2.left_stick_x * -0.8f;
+            final float power = this.gamepad2.left_stick_x * 0.8f;
+            this.telemetry.addData("adjusting slide", power);
+            this.clawSlide.slideRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             this.clawSlide.slideRotate.setPower(power);
         }
         if (this.gamepad2.left_stick_y != 0) {
             float power = -this.gamepad2.left_stick_y * 0.8f;
-            this.clawSlide.slideLift.left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            this.clawSlide.slideLift.right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            this.clawSlide.slideLift.left.setPower(power);
-            this.clawSlide.slideLift.right.setPower(power);
+            this.clawSlide.slideLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            this.clawSlide.slideLift.setPower(power);
         }
     }
 
+    protected void onStopAdjustSlide() {
+        this.clawSlide.slideLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        this.clawSlide.slideRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        this.clawSlide.slideLift.setPower(ClawSlide.LIFT_POWER1);
+        this.clawSlide.slideRotate.setPower(ClawSlide.ROTATE_POWER);
+    }
+
     protected void adjustSlideRotateUp() {
-        this.clawSlide.slideRotate.left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.clawSlide.slideRotate.right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.telemetry.addData("adjusting slide", "up");
+        this.clawSlide.slideRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.clawSlide.slideRotate.setPower(-0.6f);
     }
 
     protected void adjustSlideRotateDown() {
-        this.clawSlide.slideRotate.left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.clawSlide.slideRotate.right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.telemetry.addData("adjusting slide", "down");
+        this.clawSlide.slideRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.clawSlide.slideRotate.setPower(0.4f);
     }
 
