@@ -37,20 +37,20 @@ public abstract class AbstractTeleOp extends OpMode {
         this.driver.followTrajectorySequenceAsync(null);
         this.drive = new MecanumDrive(
             MAX_DRIVE_POWER,
-            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_FRONT_WHEEL), cachedHardwares),
-            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_REAR_WHEEL), cachedHardwares),
-            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.LEFT_FRONT_WHEEL), cachedHardwares),
-            CachedHardware.wrapAndAddEx(hardwareMap.get(DcMotorEx.class, Configurations.LEFT_REAR_WHEEL), cachedHardwares)
+            hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_FRONT_WHEEL),
+            hardwareMap.get(DcMotorEx.class, Configurations.RIGHT_REAR_WHEEL),
+            hardwareMap.get(DcMotorEx.class, Configurations.LEFT_FRONT_WHEEL),
+            hardwareMap.get(DcMotorEx.class, Configurations.LEFT_REAR_WHEEL)
         );
         this.clawSlide = new ClawSlide(
-            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_ROT), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_ROT), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_LIFT), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_LIFT), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ROT), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ROT), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ARM), cachedHardwares),
-            CachedHardware.wrapAndAdd(hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ARM), cachedHardwares)
+            hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_ROT),
+            hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_ROT),
+            hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_LIFT),
+            hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_LIFT),
+            hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ROT),
+            hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ROT),
+            hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ARM),
+            hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ARM)
         );
         this.clawSlide.claw.closeAll();
     }
@@ -84,9 +84,9 @@ public abstract class AbstractTeleOp extends OpMode {
         boolean clawActioned = false;
 
         if (this.shouldReleaseRestrictions()) {
-            this.clawSlide.releaseRestrictions();
+            this.onReleaseRestriction();
         } else if (this.shouldApplyRestrictions()) {
-            this.clawSlide.setRestrictions();
+            this.onApplyRestriction();
         }
 
         /// Slides
@@ -139,15 +139,18 @@ public abstract class AbstractTeleOp extends OpMode {
             this.clawSlide.cancelAction();
         }
         if (!adjustingSlide) {
+            this.telemetry.addLine("updating clawSlide");
             this.clawSlide.update();
         }
 
         /// Drives
+        this.beforeDriveUpdate();
         float xPower = this.getXPower(), yPower = this.getYPower(), rotatePower = this.getRotatePower();
         boolean moving = xPower != 0 || yPower != 0 || rotatePower != 0;
-        this.drive.shift(xPower, yPower);
-        this.drive.rotate(Math.signum(rotatePower) * rotatePower * rotatePower);
-        this.beforeDriveUpdate();
+        if (moving) {
+            this.drive.shift(xPower, yPower);
+            this.drive.rotate(Math.signum(rotatePower) * rotatePower * rotatePower * this.getRotateScalePower());
+        }
         if (this.driver.isBusy()) {
             if (moving) {
                 this.drive.updatePowers();
@@ -237,9 +240,20 @@ public abstract class AbstractTeleOp extends OpMode {
     protected abstract boolean shouldReleaseRestrictions();
     protected abstract boolean shouldApplyRestrictions();
 
+    protected void onReleaseRestriction() {
+        this.clawSlide.releaseRestrictions();
+    }
+
+    protected void onApplyRestriction() {
+        this.clawSlide.setRestrictions();
+    }
+
     protected abstract float getXPower();
     protected abstract float getYPower();
     protected abstract float getRotatePower();
+    protected float getRotateScalePower() {
+        return 1.0f;
+    }
 
     protected boolean inSlideAdjustMode() {
         return this.gamepad2.guide;

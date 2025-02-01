@@ -76,6 +76,13 @@ public class MotorPair {
         return this.minPosition;
     }
 
+    public void setMinPosition(int pos) {
+        this.minPosition = pos;
+        if (this.minPosition > this.currentTargetPos) {
+            this.setPosition(this.currentTargetPos);
+        }
+    }
+
     public int getMaxPosition() {
         return this.maxPosition;
     }

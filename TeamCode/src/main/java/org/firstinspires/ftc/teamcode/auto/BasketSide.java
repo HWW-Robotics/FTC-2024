@@ -60,6 +60,11 @@ public class BasketSide extends OpMode {
 
         // builder.lineToLinearHeading(new Pose2d(3.0, 23.0, Math.toRadians(0)));
 
+        builder.addTemporalMarker(() -> {
+            this.clawSlide.slideLift.setMinPosition(0);
+            this.clawSlide.slideLift.setPosition(0);
+        });
+
         this.sequence = builder.build();
 
         this.clawSlide.claw.closeAll();

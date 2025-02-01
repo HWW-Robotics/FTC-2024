@@ -12,14 +12,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.List;
 
-public class CachedMotor implements CachedHardware, DcMotor {
-    private final DcMotor motor;
+public class CachedMotor<T extends DcMotor> implements CachedHardware, DcMotor {
+    protected final T motor;
     private MotorConfigurationType motorType = null;
     private int targetPosition = 0;
     private int currentPosition = 0;
     private double power = 0;
 
-    private CachedMotor(DcMotor motor) {
+    private CachedMotor(T motor) {
         this.motor = motor;
     }
 
@@ -156,18 +156,17 @@ public class CachedMotor implements CachedHardware, DcMotor {
         this.motor.close();
     }
 
-    public static class CachedMotorEx extends CachedMotor implements DcMotorEx {
-        private final DcMotorEx motor;
+    public static class CachedMotorEx<T extends DcMotorEx> extends CachedMotor<T> implements DcMotorEx {
         private boolean enabled = true;
         private double velocity = 0;
 
-        private CachedMotorEx(DcMotorEx motor) {
+        private CachedMotorEx(T motor) {
             super(motor);
-            this.motor = motor;
         }
 
         @Override
         public void updateInfos() {
+            super.updateInfos();
             // this.enabled = this.motor.isMotorEnabled();
             this.velocity = this.motor.getVelocity();
         }
@@ -270,26 +269,17 @@ public class CachedMotor implements CachedHardware, DcMotor {
         }
     }
 
-    public static CachedMotor wrap(DcMotor motor) {
+    @SuppressWarnings("unchecked")
+    public static <T extends DcMotor> T wrap(T motor) {
         if (motor instanceof DcMotorEx) {
-            return new CachedMotorEx((DcMotorEx)(motor));
+            return (T) new CachedMotorEx<DcMotorEx>((DcMotorEx)(motor));
         }
-        return new CachedMotor(motor);
+        return (T) new CachedMotor<T>(motor);
     }
 
-    public static CachedMotorEx wrap(DcMotorEx motor) {
-        return new CachedMotorEx(motor);
-    }
-
-    public static DcMotor wrapAndAdd(DcMotor motor, List<? super CachedMotor> list) {
-        CachedMotor wrapped = wrap(motor);
-        list.add(wrapped);
-        return wrapped;
-    }
-
-    public static DcMotorEx wrapAndAddEx(DcMotorEx motor, List<? super CachedMotorEx> list) {
-        CachedMotorEx wrapped = wrap(motor);
-        list.add(wrapped);
+    public static <T extends DcMotor> T wrapAndAdd(T motor, List<CachedHardware> list) {
+        T wrapped = wrap(motor);
+        list.add((CachedHardware) wrapped);
         return wrapped;
     }
 }

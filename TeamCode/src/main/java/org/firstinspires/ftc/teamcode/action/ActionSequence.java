@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.action;
 
+import org.firstinspires.ftc.teamcode.GlobalStorage;
+
 public class ActionSequence implements ActionStage {
     private final ActionStage[] stages;
     private int stage = -1;
@@ -38,6 +40,7 @@ public class ActionSequence implements ActionStage {
             this.stage = 0;
             this.stages[this.stage].begin();
         }
+        GlobalStorage.addData("seq updating", this.stage);
         ActionStage stage = this.stages[this.stage];
         while (stage.isDone()) {
             stage.after();

@@ -9,15 +9,11 @@ import java.util.List;
 public interface CachedHardware {
     void updateInfos();
 
-    static Servo wrapAndAdd(Servo servo, List<? super CachedServo> list) {
+    static Servo wrapAndAdd(Servo servo, List<CachedHardware> list) {
         return CachedServo.wrapAndAdd(servo, list);
     }
 
-    static DcMotor wrapAndAdd(DcMotor motor, List<? super CachedMotor> list) {
-        return CachedMotor.wrapAndAdd(motor, list);
-    }
-
-    static DcMotorEx wrapAndAddEx(DcMotorEx motor, List<? super CachedMotor.CachedMotorEx> list) {
-        return CachedMotor.wrapAndAddEx(motor, list);
+    static <T extends DcMotor> T wrapAndAdd(T motor, List<CachedHardware> list) {
+        return CachedMotor.<T>wrapAndAdd(motor, list);
     }
 }

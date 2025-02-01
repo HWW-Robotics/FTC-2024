@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.action;
 
+import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.drive.MotorPair;
 
 public class MotorPairAction implements ActionStage {
@@ -22,6 +23,7 @@ public class MotorPairAction implements ActionStage {
 
     @Override
     public void update() {
+        GlobalStorage.addData("motor updating", this.targetPos);
         this.motors.setPosition(this.targetPos);
     }
 

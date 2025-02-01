@@ -31,9 +31,9 @@ public class ClawSlide {
 
     private final ActionSequence
         PUT_DOWN_ACTION,
-        PUT_DOWN_AND_EXTEND_ACTION_NO_PICK,
         PUT_DOWN_AND_EXTEND_ACTION,
-        RETRACT_AND_PULL_UP_ACTION;
+        RETRACT_AND_PULL_UP_ACTION,
+        PUT_DOWN_FOR_HANG_ACTION;
 
     public final MotorPair slideRotate, slideLift;
     public final Claw claw;
@@ -68,12 +68,6 @@ public class ClawSlide {
             new MotorPairAction(this.slideRotate, 938),
             new TimedUpdateAction(0.3, () -> this.claw.setRotate(113)));
 
-        this.PUT_DOWN_AND_EXTEND_ACTION_NO_PICK = new ActionSequence(
-            new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
-            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
-            new MotorPairAction(this.slideRotate, 945),
-            new MotorPairAction(this.slideLift, 1125));
-
         this.PUT_DOWN_AND_EXTEND_ACTION = new ActionSequence(
             new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
             new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
@@ -92,6 +86,13 @@ public class ClawSlide {
                 )
             ),
             new MotorPairAction(this.slideRotate, 0)
+        );
+
+        this.PUT_DOWN_FOR_HANG_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.1, () -> this.claw.setRotate(Claw.MAX_ROT)),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
+            new MotorPairAction(this.slideRotate, 458)
+            // new MotorPairAction(this.slideLift, 1000)
         );
 
         this.slideRotate.resetPosition();
@@ -124,16 +125,16 @@ public class ClawSlide {
         this.setAction(this.PUT_DOWN_ACTION);
     }
 
-    public void putDownAndExtendNoPick() {
-        this.setAction(this.PUT_DOWN_AND_EXTEND_ACTION_NO_PICK);
-    }
-
     public void putDownAndExtend() {
         this.setAction(this.PUT_DOWN_AND_EXTEND_ACTION);
     }
 
     public void retractAndPullUp() {
         this.setAction(this.RETRACT_AND_PULL_UP_ACTION);
+    }
+
+    public void putDownForHang() {
+        this.setAction(this.PUT_DOWN_FOR_HANG_ACTION);
     }
 
     public void releaseRestrictions() {
