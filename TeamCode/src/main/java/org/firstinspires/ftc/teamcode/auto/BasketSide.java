@@ -9,12 +9,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Configurations;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
+import org.firstinspires.ftc.teamcode.action.ActionSequence;
+import org.firstinspires.ftc.teamcode.action.TimedAction;
 import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
-@Autonomous(name = "BasketSide")
+@Autonomous(name = "BasketSide", preselectTeleOp = "ASingleTeleOp")
 public class BasketSide extends OpMode {
 
     long lastLoopStart = 0;
@@ -46,11 +48,11 @@ public class BasketSide extends OpMode {
         this.addPutSequence(builder);
 
         builder
-            .lineToLinearHeading(new Pose2d(14,15.08, Math.toRadians(0)));
+            .lineToLinearHeading(new Pose2d(14,17.08, Math.toRadians(0)));
         this.addPickAndPutSequence(builder);
 
         builder
-            .lineToLinearHeading(new Pose2d(14, 25.66, Math.toRadians(0)));
+            .lineToLinearHeading(new Pose2d(14, 26.66, Math.toRadians(0)));
         // this.addPickAndPutSequence(builder);
 
         // builder
@@ -128,11 +130,11 @@ public class BasketSide extends OpMode {
         builder
             .addTemporalMarker(clawSlide.claw::openAll)
             .addTemporalMarker(clawSlide::putDown)
-            .waitSeconds(1.9)
+            .waitSeconds(1.6)
             .addTemporalMarker(clawSlide.claw::closeAll)
-            .waitSeconds(0.3)
-            .addTemporalMarker(clawSlide::retractAndPullUp)
-            .waitSeconds(1.4);
+            .waitSeconds(0.2)
+            .addTemporalMarker(clawSlide::retractAndPullUpOpen)
+            .waitSeconds(1.2);
         this.addPutSequence(builder);
     }
 
@@ -141,11 +143,11 @@ public class BasketSide extends OpMode {
         builder
             .lineToLinearHeading(new Pose2d(5.5, 23.25, Math.toRadians(135)))
             .addTemporalMarker(() -> this.clawSlide.claw.setRotate(30))
-            .lineToLinearHeading(new Pose2d(3.27, 24.9, Math.toRadians(130)))
             .addTemporalMarker(() -> this.clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION))
-            .waitSeconds(1.4)
-            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(130))
-            .waitSeconds(0.2)
+            .lineToLinearHeading(new Pose2d(3.27, 24.9, Math.toRadians(130)))
+            .waitSeconds(0.6)
+            .addTemporalMarker(() -> this.clawSlide.claw.setRotate(150))
+            .waitSeconds(0.3)
             .addTemporalMarker(this.clawSlide.claw::openAll)
             .waitSeconds(0.2)
             .addTemporalMarker(() -> this.clawSlide.claw.setRotate(30))
