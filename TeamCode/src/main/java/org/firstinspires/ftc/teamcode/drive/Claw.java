@@ -7,7 +7,7 @@ public class Claw {
     public static final double MIN_ROT = 2;
     public static final double MAX_ROT = 175;
     public static final double MIN_CLAW = 8;
-    public static final double MAX_CLAW = 46;
+    public static final double MAX_CLAW = 44.5;
     public static final double LEFT_CLOSE_ANGLE = MIN_CLAW;
     public static final double LEFT_OPEN_ANGLE = MAX_CLAW;
     public static final double RIGHT_CLOSE_ANGLE = MAX_CLAW;
@@ -80,8 +80,8 @@ public class Claw {
     }
 
     public void closeAll() {
-        this.closeLeft();
         this.closeRight();
+        this.closeLeft();
     }
 
     public void closeLeft() {
@@ -93,8 +93,8 @@ public class Claw {
     }
 
     public void openAll() {
-        this.openLeft();
         this.openRight();
+        this.openLeft();
     }
 
     public void openLeft() {

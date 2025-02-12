@@ -6,11 +6,16 @@ import org.firstinspires.ftc.teamcode.drive.MotorPair;
 public class MotorPairAction implements ActionStage {
     private final MotorPair motors;
     private final int targetPos;
-    private final int maxDiff = 20;
+    private final int maxDiff;
 
-    public MotorPairAction(MotorPair motors, int targetPos) {
+    public MotorPairAction(MotorPair motors, int targetPos, int maxDiff) {
         this.motors = motors;
         this.targetPos = targetPos;
+        this.maxDiff = maxDiff;
+    }
+
+    public MotorPairAction(MotorPair motors, int targetPos) {
+        this(motors, targetPos, 20);
     }
 
     @Override

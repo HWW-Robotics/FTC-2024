@@ -4,19 +4,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.auto.BasketSide;
 import org.firstinspires.ftc.teamcode.drive.Claw;
-import org.firstinspires.ftc.teamcode.drive.ClawSlide;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @TeleOp(name = "ASingleTeleOp")
 public class ASingleTeleOp extends AbstractTeleOp {
-    static final Pose2d BASKET_READY_POSE = new Pose2d(5.5, 23.25, Math.toRadians(135));
-
-    private static final Gamepad.LedEffect RELEASED_WARN_LED = new Gamepad.LedEffect.Builder()
-        .addStep(1.0, 1.0, 0.0, 650)
-        .addStep(0.0, 0.0, 0.0, 350)
-        .setRepeating(true)
-        .build();
+    static final Pose2d BASKET_READY_POSE = BasketSide.BASKET_READY_POSE;
 
     private boolean stage2 = false;
 
@@ -38,8 +31,6 @@ public class ASingleTeleOp extends AbstractTeleOp {
     protected void onReleaseRestriction() {
         super.onReleaseRestriction();
         this.stage2 = true;
-        this.gamepad1.runLedEffect(RELEASED_WARN_LED);
-        this.gamepad2.runLedEffect(RELEASED_WARN_LED);
     }
 
     @Override
@@ -128,14 +119,13 @@ public class ASingleTeleOp extends AbstractTeleOp {
             return this.stage2ClawSlideUpdate(dt);
         }
         boolean updated = false;
-        if (this.gamepad1.b && !this.gamepad1.start) {
-            if (this.clawSlide.slideRotate.getTargetPosition() < 600) {
-                this.clawSlide.claw.setRotate(110);
-            }
-            updated = true;
+        if (!this.prevGamepad1.b && this.gamepad1.b && !this.gamepad1.start) {
+            this.clawSlide.claw.openAll();
+            this.clawSlide.putDownInBar();
         } else if (!this.prevGamepad1.y && this.gamepad1.y) {
             this.clawSlide.retractAndPullUp();
         } else if (!this.prevGamepad1.x && this.gamepad1.x) {
+            this.clawSlide.claw.openAll();
             this.clawSlide.putDown();
         } else if (!this.prevGamepad1.a && this.gamepad1.a) {
             this.clawSlide.claw.setRotate(20);
@@ -147,6 +137,11 @@ public class ASingleTeleOp extends AbstractTeleOp {
         } else if (this.gamepad1.dpad_right) {
             this.clawSlide.claw.rotate(50 * dt);
             updated = true;
+        } else if (!this.prevGamepad1.left_stick_button && this.gamepad1.left_stick_button) {
+            // Go in front of the basket and turn to 135°
+            Pose2d pose = this.driver.getPoseEstimate();
+            this.clawSlide.setAction(BasketSide.buildPutSequence(this.driver, this.clawSlide, pose));
+            this.clawSlide.claw.setRotate(8);
         }
         return updated;
     }
@@ -156,7 +151,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
         if (!this.prevGamepad2.y && this.gamepad2.y) {
             this.clawSlide.putDownForHang();
         } else if (!this.prevGamepad2.x && this.gamepad2.x) {
-            // this.clawSlide.putDown();
+            this.clawSlide.slideLift.setPosition(0);
         } else if (!this.prevGamepad2.a && this.gamepad2.a) {
             this.clawSlide.claw.setRotate(Claw.MAX_ROT);
             updated = true;
@@ -173,14 +168,10 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected void beforeDriveUpdate() {
-        if (!this.prevGamepad1.left_stick_button && this.gamepad1.left_stick_button) {
-            // Go in front of the basket and turn to 135°
-            Pose2d pose = this.driver.getPoseEstimate();
-            this.driver.followTrajectorySequenceAsync(this.driver.trajectorySequenceBuilder(pose)
-                .lineToLinearHeading(BASKET_READY_POSE)
-                .build());
-            this.clawSlide.claw.setRotate(8);
-        } else if (!this.prevGamepad1.right_stick_button && this.gamepad1.right_stick_button) {
+        if (this.stage2) {
+            return;
+        }
+        if (!this.prevGamepad1.right_stick_button && this.gamepad1.right_stick_button) {
             // Turn to 270°
             Pose2d pose = this.driver.getPoseEstimate();
             double angle = Math.toRadians(270) - pose.getHeading();

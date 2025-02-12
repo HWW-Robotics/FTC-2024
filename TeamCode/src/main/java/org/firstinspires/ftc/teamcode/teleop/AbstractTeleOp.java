@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Configurations;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.cache.CachedHardware;
@@ -24,7 +23,7 @@ public abstract class AbstractTeleOp extends OpMode {
     public Gamepad prevGamepad2 = new Gamepad();
 
     long lastLoopStart = 0;
-    List<CachedHardware> cachedHardwares = new ArrayList<>();
+    List<CachedHardware> cachedHardware = new ArrayList<>();
     SampleMecanumDrive driver;
     MecanumDrive drive;
     ClawSlide clawSlide;
@@ -42,17 +41,7 @@ public abstract class AbstractTeleOp extends OpMode {
             hardwareMap.get(DcMotorEx.class, Configurations.LEFT_FRONT_WHEEL),
             hardwareMap.get(DcMotorEx.class, Configurations.LEFT_REAR_WHEEL)
         );
-        this.clawSlide = new ClawSlide(
-            hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_ROT),
-            hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_ROT),
-            hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_LIFT),
-            hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_LIFT),
-            hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ROT),
-            hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ROT),
-            hardwareMap.get(Servo.class, Configurations.LEFT_CLAW_ARM),
-            hardwareMap.get(Servo.class, Configurations.RIGHT_CLAW_ARM)
-        );
-        this.clawSlide.claw.closeAll();
+        this.clawSlide = GlobalStorage.getOrCreateClawSlide(hardwareMap);
     }
 
     @Override
@@ -60,7 +49,7 @@ public abstract class AbstractTeleOp extends OpMode {
         final long startTime = System.nanoTime();
         final float loopInterval = (float)(startTime - lastLoopStart) / 1e9f;
 
-        for (CachedHardware c : cachedHardwares) {
+        for (CachedHardware c : cachedHardware) {
             c.updateInfos();
         }
 
@@ -71,11 +60,17 @@ public abstract class AbstractTeleOp extends OpMode {
     }
 
     @Override
+    public void start() {
+        this.clawSlide.claw.closeAll();
+        this.clawSlide.claw.setRotate(30);
+    }
+
+    @Override
     public void loop() {
         final long startTime = System.nanoTime();
         final float loopInterval = (float)(startTime - lastLoopStart) / 1e9f;
 
-        for (CachedHardware c : cachedHardwares) {
+        for (CachedHardware c : cachedHardware) {
             c.updateInfos();
         }
 
@@ -256,7 +251,7 @@ public abstract class AbstractTeleOp extends OpMode {
     }
 
     protected boolean inSlideAdjustMode() {
-        return this.gamepad2.guide;
+        return this.gamepad2.getGamepadId() != Gamepad.ID_UNASSOCIATED && this.gamepad2.guide;
     }
     protected abstract int getSlideRotateTargetSpeed();
     protected abstract boolean shouldSlideRotateReset();
