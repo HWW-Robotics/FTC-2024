@@ -22,7 +22,7 @@ public class BAutoReset extends OpMode {
 
     @Override
     public void init() {
-        GlobalStorage.destroyDriver();
+        GlobalStorage.destroyAll();
         this.leftRotation = hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_ROT);
         this.rightRotation = hardwareMap.get(DcMotor.class, Configurations.RIGHT_SLIDE_ROT);
         this.leftSlide = hardwareMap.get(DcMotor.class, Configurations.LEFT_SLIDE_LIFT);

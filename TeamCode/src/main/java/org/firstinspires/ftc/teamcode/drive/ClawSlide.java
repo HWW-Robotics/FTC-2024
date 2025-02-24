@@ -6,20 +6,21 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.action.ActionSequence;
 import org.firstinspires.ftc.teamcode.action.ActionSet;
+import org.firstinspires.ftc.teamcode.action.ActionStage;
 import org.firstinspires.ftc.teamcode.action.ConditionedAction;
 import org.firstinspires.ftc.teamcode.action.MotorPairAction;
 import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
 
 public class ClawSlide {
-    private static final float ROTATE_POWER = 0.4f;
-    private static final float LIFT_POWER1 = 0.8f;
-    private static final float LIFT_POWER2 = 0.8f;
+    public static final float ROTATE_POWER = 0.8f;
+    public static final float LIFT_POWER1 = 0.9f;
+    public static final float LIFT_POWER2 = 1.0f;
 
     public static final int ROTATE_MAX_POSITION = 1090;
     private static final double ROTATE_ANGLE_RATIO = 90.0 / 990;
     public static final int LIFT_MIN_POSITION = 40;
     public static final int LIFT_MAX_POSITION = 2930;
-    private static final int LIFT_MAX_POSITION_HORIZON = 2150;
+    private static final int LIFT_MAX_POSITION_HORIZON = 1380;
 
     private static final double ROTATE_JOINT_HEIGHT = 9.7;
     private static final double LIFT_MIN_POSITION_LENGTH = 30.6;
@@ -29,14 +30,17 @@ public class ClawSlide {
     private static final double CLAW_ROT_OFFSET = 70;
     private static final double CLAW_ARM_LENGTH = 18.0;
 
-    private final ActionSequence
+    public final ActionSequence
         PUT_DOWN_ACTION,
         PUT_DOWN_AND_EXTEND_ACTION,
-        RETRACT_AND_PULL_UP_ACTION;
+        PUT_DOWN_IN_BAR_ACTION,
+        RETRACT_AND_PULL_UP_ACTION,
+        RETRACT_AND_PULL_UP_OPEN_ACTION,
+        PUT_DOWN_FOR_HANG_ACTION;
 
     public final MotorPair slideRotate, slideLift;
     public final Claw claw;
-    private ActionSequence action = null;
+    private ActionStage action = null;
     private boolean restricted = true;
 
     public ClawSlide(
@@ -74,6 +78,12 @@ public class ClawSlide {
             new MotorPairAction(this.slideLift, 1125),
             new TimedUpdateAction(0.3, () -> this.claw.setRotate(102)));
 
+        this.PUT_DOWN_IN_BAR_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.1, () -> this.claw.setRotate(20)),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
+            new MotorPairAction(this.slideRotate, 736),
+            new TimedUpdateAction(0.3, () -> this.claw.setRotate(175)));
+
         this.RETRACT_AND_PULL_UP_ACTION = new ActionSequence(
             new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
             new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
@@ -81,10 +91,25 @@ public class ClawSlide {
                 () -> this.slideRotate.getLeftPosition() > 600,
                 new ActionSequence(
                     new MotorPairAction(this.slideRotate, 600),
-                    new TimedUpdateAction(0.08, () -> this.claw.setRotate(195))
+                    new TimedUpdateAction(0.05, () -> this.claw.setRotate(Claw.MAX_ROT))
                 )
             ),
             new MotorPairAction(this.slideRotate, 0)
+        );
+
+        this.RETRACT_AND_PULL_UP_OPEN_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.2, () -> this.claw.setRotate(105)),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
+            new MotorPairAction(this.slideRotate, 0),
+            new TimedUpdateAction(0.08, () -> this.claw.setRotate(10))
+        );
+
+        this.PUT_DOWN_FOR_HANG_ACTION = new ActionSequence(
+            new TimedUpdateAction(0.1, () -> this.claw.setRotate(Claw.MAX_ROT)),
+            new MotorPairAction(this.slideLift, LIFT_MIN_POSITION),
+            new MotorPairAction(this.slideRotate, 385),
+            new MotorPairAction(this.slideLift, 1750),
+            new MotorPairAction(this.slideRotate, 295)
         );
 
         this.slideRotate.resetPosition();
@@ -105,7 +130,7 @@ public class ClawSlide {
         this.action = null;
     }
 
-    private void setAction(ActionSequence action) {
+    public void setAction(ActionStage action) {
         if (this.inAction()) {
             this.cancelAction();
         }
@@ -117,12 +142,24 @@ public class ClawSlide {
         this.setAction(this.PUT_DOWN_ACTION);
     }
 
+    public void putDownInBar() {
+        this.setAction(this.PUT_DOWN_IN_BAR_ACTION);
+    }
+
     public void putDownAndExtend() {
         this.setAction(this.PUT_DOWN_AND_EXTEND_ACTION);
     }
 
     public void retractAndPullUp() {
         this.setAction(this.RETRACT_AND_PULL_UP_ACTION);
+    }
+
+    public void retractAndPullUpOpen() {
+        this.setAction(this.RETRACT_AND_PULL_UP_OPEN_ACTION);
+    }
+
+    public void putDownForHang() {
+        this.setAction(this.PUT_DOWN_FOR_HANG_ACTION);
     }
 
     public void releaseRestrictions() {
@@ -148,12 +185,12 @@ public class ClawSlide {
         }
         GlobalStorage.addData("Position Restriction", this.restricted);
         if (this.restricted) {
-            double maxClawAngle = this.getMaxSafeClawAngle();
-            double maxSlideAngle = this.getMaxSafeSlideAngle();
-            double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
-            GlobalStorage.addData("D: Max Claw Rot:", maxClawAngle);
-            GlobalStorage.addData("D: Max Slide Rot:", maxSlideAngle);
-            GlobalStorage.addData("D: Max Slide Pos:", maxSlidePos);
+            // double maxClawAngle = this.getMaxSafeClawAngle();
+            // double maxSlideAngle = this.getMaxSafeSlideAngle();
+            // double maxSlidePos = this.getMaxSafeSlidePos() - LIFT_MIN_POSITION_LENGTH;
+            // GlobalStorage.addData("D: Max Claw Rot:", maxClawAngle);
+            // GlobalStorage.addData("D: Max Slide Rot:", maxSlideAngle);
+            // GlobalStorage.addData("D: Max Slide Pos:", maxSlidePos);
             // this.claw.setMaxRot(maxClawAngle - CLAW_ROT_OFFSET);
             // this.slideRotate.setMaxPosition((int)(maxSlideAngle / ROTATE_ANGLE_RATIO));
             // this.slideLift.setMaxPosition((int)(maxSlidePos / LIFT_POSITION_LENGTH_RATIO));
@@ -167,12 +204,7 @@ public class ClawSlide {
         } else {
             this.claw.setMaxRot(Claw.MAX_ROT);
             this.slideRotate.setMaxPosition(2000);
-            final double horizonRatio = Math.sin(Math.toRadians(this.slideRotate.getLeftPosition() * ROTATE_ANGLE_RATIO));
-            int maxPos = LIFT_MAX_POSITION;
-            if (horizonRatio > 0) {
-                maxPos = Math.min(maxPos, (int) (LIFT_MAX_POSITION_HORIZON / horizonRatio));
-            }
-            this.slideLift.setMaxPosition(maxPos);
+            this.slideLift.setMaxPosition(LIFT_MAX_POSITION);
         }
 
         this.slideRotate.update();

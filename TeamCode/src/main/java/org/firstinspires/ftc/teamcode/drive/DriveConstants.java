@@ -86,10 +86,10 @@ public class DriveConstants {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
 
      */
-    public static double MAX_VEL = 30;
-    public static double MAX_ACCEL = 15;
+    public static double MAX_VEL = 60;
+    public static double MAX_ACCEL = 17;
     public static double MAX_ANG_VEL = Math.toRadians(180);
-    public static double MAX_ANG_ACCEL = Math.toRadians(120);
+    public static double MAX_ANG_ACCEL = Math.toRadians(180);
 
     public static double X_POD_OFFSET = -40.011; // left distance in mm
     public static double Y_POD_OFFSET = 183.93; // forward distance in mm

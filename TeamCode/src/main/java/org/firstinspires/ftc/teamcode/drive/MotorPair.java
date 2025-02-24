@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class MotorPair {
     public final DcMotor left, right;
     private int minPosition, maxPosition;
+    private DcMotor.RunMode mode = DcMotor.RunMode.RUN_TO_POSITION;
     private float power;
     private int currentTargetPos;
     private int graduatedVelocity = 0;
@@ -26,12 +30,16 @@ public class MotorPair {
         this.right = right;
         this.left.setDirection(leftDirection);
         this.right.setDirection(rightDirection);
+        this.left.setPower(0);
+        this.right.setPower(0);
+        this.left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.left.setTargetPosition(0);
         this.right.setTargetPosition(0);
         this.left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         this.right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        this.left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.left.setPower(this.power);
         this.right.setPower(this.power);
     }
@@ -41,13 +49,38 @@ public class MotorPair {
     }
 
     public void setPower(float power) {
-        this.power = Math.min(Math.max(power, 0), 1);
+        this.power = Math.min(Math.max(power, -1), 1);
         this.left.setPower(this.power);
         this.right.setPower(this.power);
     }
 
+    public void setMode(DcMotor.RunMode mode) {
+        this.mode = mode;
+        if (mode != DcMotor.RunMode.RUN_TO_POSITION) {
+            this.left.setMode(mode);
+            this.right.setMode(mode);
+        }
+    }
+
+    public void setVelocity(float speed) {
+        ((DcMotorEx)(this.left)).setVelocity(speed);
+        ((DcMotorEx)(this.right)).setVelocity(speed);
+    }
+
+    public void setVelocity(float speed, AngleUnit unit) {
+        ((DcMotorEx)(this.left)).setVelocity(speed, unit);
+        ((DcMotorEx)(this.right)).setVelocity(speed, unit);
+    }
+
     public int getMinPosition() {
         return this.minPosition;
+    }
+
+    public void setMinPosition(int pos) {
+        this.minPosition = pos;
+        if (this.minPosition > this.currentTargetPos) {
+            this.setPosition(this.currentTargetPos);
+        }
     }
 
     public int getMaxPosition() {
@@ -92,52 +125,11 @@ public class MotorPair {
     }
 
     public void update() {
-        // if (this.graduatedVelocity == 0) {
-            this.left.setTargetPosition(this.currentTargetPos);
-            this.right.setTargetPosition(this.currentTargetPos);
-        // } else {
-        //     int leftTarget = this.left.getTargetPosition();
-        //     int rightTarget = this.right.getTargetPosition();
-        //     int leftNextTarget = leftTarget, rightNextTarget = rightTarget;
-        //     if (leftTarget != this.currentTargetPos) {
-        //         int leftPos = this.left.getCurrentPosition();
-        //         if (Math.abs(leftPos - leftTarget) < this.graduatedVelocity) {
-        //             if (leftPos > this.currentTargetPos) {
-        //                 leftNextTarget = Math.max(leftTarget - this.graduatedVelocity, this.currentTargetPos);
-        //             } else if (leftPos < this.currentTargetPos) {
-        //                 leftNextTarget = Math.max(leftTarget + this.graduatedVelocity, this.currentTargetPos);
-        //             }
-        //         }
-        //     }
-        //     if (rightTarget != this.currentTargetPos) {
-        //         int rightPos = this.right.getCurrentPosition();
-        //         if (Math.abs(rightPos - rightTarget) < this.graduatedVelocity) {
-        //             if (rightPos > this.currentTargetPos) {
-        //                 rightNextTarget = Math.max(rightTarget - this.graduatedVelocity, this.currentTargetPos);
-        //             } else if (rightPos < this.currentTargetPos) {
-        //                 rightNextTarget = Math.max(rightTarget + this.graduatedVelocity, this.currentTargetPos);
-        //             }
-        //         }
-        //     }
-        //     if (rightNextTarget > rightTarget) {
-        //         rightNextTarget = Math.min(rightNextTarget, leftNextTarget);
-        //     } else if (rightNextTarget < rightTarget) {
-        //         rightNextTarget = Math.max(rightNextTarget, leftNextTarget);
-        //     }
-        //     if (leftNextTarget > leftTarget) {
-        //         leftNextTarget = Math.min(leftNextTarget, rightNextTarget);
-        //     } else if (leftNextTarget < leftTarget) {
-        //         leftNextTarget = Math.max(leftNextTarget, rightNextTarget);
-        //     }
-        //     if (leftTarget != leftNextTarget) {
-        //         this.left.setTargetPosition(leftNextTarget);
-        //     }
-        //     if (rightTarget != rightNextTarget) {
-        //         this.right.setTargetPosition(rightNextTarget);
-        //     }
-        // }
-        this.left.setPower(this.power);
-        this.right.setPower(this.power);
+        if (this.mode != DcMotor.RunMode.RUN_TO_POSITION) {
+            return;
+        }
+        this.left.setTargetPosition(this.currentTargetPos);
+        this.right.setTargetPosition(this.currentTargetPos);
         this.left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         this.right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }

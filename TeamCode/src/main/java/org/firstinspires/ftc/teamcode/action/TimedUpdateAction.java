@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.action;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.GlobalStorage;
+
 import java.util.function.Consumer;
 
 public class TimedUpdateAction implements ActionStage {
@@ -24,6 +26,7 @@ public class TimedUpdateAction implements ActionStage {
 
     @Override
     public boolean isDone() {
+        GlobalStorage.addData("timer updating", time - this.timer.seconds());
         return this.timer.seconds() >= time;
     }
 
