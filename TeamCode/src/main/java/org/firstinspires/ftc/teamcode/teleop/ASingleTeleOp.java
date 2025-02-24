@@ -41,12 +41,12 @@ public class ASingleTeleOp extends AbstractTeleOp {
 
     @Override
     protected float getXPower() {
-        return this.stage2 ? this.gamepad2.right_stick_x : this.gamepad1.left_stick_x;
+        return this.stage2 ? this.gamepad2.left_stick_x : this.gamepad1.left_stick_x;
     }
 
     @Override
     protected float getYPower() {
-        return this.stage2 ? this.gamepad2.right_stick_y : this.gamepad1.left_stick_y;
+        return this.stage2 ? this.gamepad2.left_stick_y : this.gamepad1.left_stick_y;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
     @Override
     protected int getSlideLiftTargetSpeed() {
         if (this.stage2) {
-            return (int)(this.gamepad2.left_stick_y * -2000);
+            return (int)(this.gamepad2.right_stick_y * -2000);
         }
         return (int)((this.gamepad1.right_trigger - this.gamepad1.left_trigger) * 2000);
     }
@@ -140,7 +140,7 @@ public class ASingleTeleOp extends AbstractTeleOp {
         } else if (!this.prevGamepad1.left_stick_button && this.gamepad1.left_stick_button) {
             // Go in front of the basket and turn to 135°
             Pose2d pose = this.driver.getPoseEstimate();
-            this.clawSlide.setAction(BasketSide.buildPutSequence(this.driver, this.clawSlide, pose));
+            this.clawSlide.setAction(BasketSide.buildPutSequence(this.driver, this.clawSlide, pose, null));
             this.clawSlide.claw.setRotate(8);
         }
         return updated;

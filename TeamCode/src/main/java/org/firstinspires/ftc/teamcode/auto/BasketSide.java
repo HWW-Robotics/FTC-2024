@@ -4,20 +4,18 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Configurations;
 import org.firstinspires.ftc.teamcode.GlobalStorage;
 import org.firstinspires.ftc.teamcode.action.ActionSequence;
 import org.firstinspires.ftc.teamcode.action.ActionStage;
 import org.firstinspires.ftc.teamcode.action.RoadRunnerPath;
 import org.firstinspires.ftc.teamcode.action.TimedAction;
-import org.firstinspires.ftc.teamcode.drive.Claw;
 import org.firstinspires.ftc.teamcode.drive.ClawSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
+
+import java.util.function.Consumer;
 
 @Autonomous(name = "BasketSide", preselectTeleOp = "ASingleTeleOp")
 public class BasketSide extends OpMode {
@@ -26,7 +24,7 @@ public class BasketSide extends OpMode {
     SampleMecanumDrive driver;
     ClawSlide clawSlide;
     ActionSequence sequence;
-    public static final Pose2d BASKET_READY_POSE = new Pose2d(3.61, 26.10, Math.toRadians(135));
+    public static final Pose2d BASKET_READY_POSE = new Pose2d(3.60, 26.10, Math.toRadians(135));
     static final Pose2d AFTER_PUT_POSE = new Pose2d(6.68, 20.73, Math.toRadians(130));
 
     @Override
@@ -42,11 +40,12 @@ public class BasketSide extends OpMode {
 
         this.sequence = new ActionSequence(
             this.buildPutSequence(new Pose2d(0, 0, 0)),
-            this.buildPickAndPutSequence(AFTER_PUT_POSE, new Pose2d(14,17.08, Math.toRadians(0))),
-
-            // new RoadRunnerPath(this.driver, AFTER_PUT_POSE, new Pose2d(14, 26.66, Math.toRadians(0))),
-            this.buildPickSequence(AFTER_PUT_POSE, new Pose2d(14, 26.66, Math.toRadians(0))),
-            // this.buildPickAndPutSequence(AFTER_PUT_POSE, new Pose2d(14, 26.66, Math.toRadians(0)));
+            this.buildPickAndPutSequence(BASKET_READY_POSE, new Pose2d(14,17.08, Math.toRadians(0))),
+            this.buildPickAndPutSequence(BASKET_READY_POSE, new Pose2d(14, 26.66, Math.toRadians(0)), (builder) -> {
+                builder.turn(Math.toRadians(-179));
+                // builder.splineToSplineHeading(new Pose2d(14, 17, Math.toRadians(130)), Math.toRadians(-90));
+                builder.lineToLinearHeading(BASKET_READY_POSE);
+            }),
             new TimedAction(0.2, () -> {
                 this.clawSlide.slideLift.setMinPosition(0);
                 this.clawSlide.slideLift.setPosition(0);
@@ -122,9 +121,13 @@ public class BasketSide extends OpMode {
     }
 
     private ActionStage buildPickAndPutSequence(Pose2d lastPose, Pose2d target) {
+        return this.buildPickAndPutSequence(lastPose, target, null);
+    }
+
+    private ActionStage buildPickAndPutSequence(Pose2d lastPose, Pose2d target, Consumer<TrajectorySequenceBuilder> beforePut) {
         return new ActionSequence(
             this.buildPickSequence(lastPose, target),
-            this.buildPutSequence(target)
+            this.buildPutSequence(target, beforePut)
         );
     }
 
@@ -140,16 +143,23 @@ public class BasketSide extends OpMode {
     }
 
     private ActionStage buildPutSequence(Pose2d endPose) {
-        return buildPutSequence(this.driver, this.clawSlide, endPose);
+        return buildPutSequence(this.driver, this.clawSlide, endPose, null);
     }
 
-    public static ActionStage buildPutSequence(SampleMecanumDrive driver, ClawSlide clawSlide, Pose2d endPose) {
-        TrajectorySequence beforePutPath = driver.trajectorySequenceBuilder(endPose)
-            .lineToLinearHeading(new Pose2d(5.5, 23.25, Math.toRadians(135)))
-            .addTemporalMarker(() -> clawSlide.claw.setRotate(30))
-            .lineToLinearHeading(BASKET_READY_POSE)
-            .addTemporalMarker(() -> clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION))
-            .build();
+    private ActionStage buildPutSequence(Pose2d endPose, Consumer<TrajectorySequenceBuilder> beforeMove) {
+        return buildPutSequence(this.driver, this.clawSlide, endPose, beforeMove);
+    }
+
+    public static ActionStage buildPutSequence(SampleMecanumDrive driver, ClawSlide clawSlide, Pose2d endPose, Consumer<TrajectorySequenceBuilder> beforeMove) {
+        TrajectorySequenceBuilder builder = driver.trajectorySequenceBuilder(endPose);
+        builder.addTemporalMarker(() -> clawSlide.claw.setRotate(30));
+        if (beforeMove != null) {
+            beforeMove.accept(builder);
+        } else {
+            builder.lineToLinearHeading(BASKET_READY_POSE);
+        }
+        builder.addTemporalMarker(() -> clawSlide.slideLift.setPosition(ClawSlide.LIFT_MAX_POSITION));
+        TrajectorySequence beforePutPath = builder.build();
         return new ActionSequence(
             new RoadRunnerPath(driver, beforePutPath),
             new ActionStage() {
@@ -161,11 +171,11 @@ public class BasketSide extends OpMode {
                 @Override
                 public void begin() {}
             },
-            new TimedAction(0.3, () -> clawSlide.claw.setRotate(150)),
+            new TimedAction(0.33, () -> clawSlide.claw.setRotate(150)),
             new TimedAction(0.2, clawSlide.claw::openAll),
             new TimedAction(0.1, () -> clawSlide.claw.setRotate(30)),
-            new TimedAction(1.0, () -> clawSlide.slideLift.setPosition(0)),
-            new RoadRunnerPath(driver, beforePutPath.end(), AFTER_PUT_POSE)
+            new TimedAction(1.0, () -> clawSlide.slideLift.setPosition(0))
+            // new RoadRunnerPath(driver, beforePutPath.end(), AFTER_PUT_POSE)
         );
     }
 }

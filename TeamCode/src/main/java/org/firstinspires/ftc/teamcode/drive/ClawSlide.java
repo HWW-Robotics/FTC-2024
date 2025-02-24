@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.action.TimedUpdateAction;
 
 public class ClawSlide {
     public static final float ROTATE_POWER = 0.8f;
-    public static final float LIFT_POWER1 = 0.8f;
-    public static final float LIFT_POWER2 = 0.8f;
+    public static final float LIFT_POWER1 = 0.9f;
+    public static final float LIFT_POWER2 = 1.0f;
 
     public static final int ROTATE_MAX_POSITION = 1090;
     private static final double ROTATE_ANGLE_RATIO = 90.0 / 990;
